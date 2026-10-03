@@ -5,16 +5,20 @@
   }
   const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform);
   const mod = isMac ? '⌘' : 'Ctrl';
+  const alt = isMac ? '⌥' : 'Alt';
   const rows: [string, string][] = [
     [`${mod} K`, 'Insert a motif or a special character'],
     [':heart', 'Motif names: type ":" and the start of the name'],
     [`${mod} P`, 'Export the chart (PDF, SVG, PNG)'],
     [`${mod} ⇧ L / E / R`, 'Align left, center, right'],
-    [`${mod} Z`, 'Undo the last change of the text'],
+    [`${mod} Z`, 'Undo the last change of the text or of the colors'],
+    [`${mod} ${alt} 1 … 9`, 'Give color 1 to 9 to the selected text'],
+    [`${mod} ${alt} 0`, 'Give the selected text back to the automatic colors'],
     [`${mod} + wheel, pinch`, 'Zoom the chart at the pointer'],
     ['Wheel, drag', 'Move the chart'],
     ['+  −  0  F', 'Zoom in, zoom out, 100 %, fit (when the chart has the focus)'],
     ['Click a letter', 'Select its text'],
+    ['Shift + click a letter', 'Add the letter to the selection'],
     ['?', 'Show this list'],
   ];
 </script>

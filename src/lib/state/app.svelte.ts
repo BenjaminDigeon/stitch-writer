@@ -4,6 +4,8 @@ import { BUILTIN_FONTS, loadFontById, loadMotifLibrary, type FontEntry } from '.
 import { customFontEntry, listCustomFonts } from '../font/custom-store.ts';
 import { MAX_COLORS, threadPlan, type ColorMode, type ColorSettings } from '../layout/color.ts';
 import { EMPTY_CHART, layout } from '../layout/layout.ts';
+import type { Span } from '../layout/types.ts';
+import { paintRange, shiftRanges, textEdit } from '../layout/ranges.ts';
 import { remapOverrides } from '../layout/remap.ts';
 import type { Rgb } from '../scene/types.ts';
 import { DMC_THREADS, threadById, type Thread } from '../threads/dmc.ts';
@@ -70,13 +72,24 @@ export class AppState {
     return this.allFonts.find((f) => f.id === this.doc.fontId);
   }
 
-  setText(next: string): void {
+  /**
+   * Changes the text. The dot overrides and the colors set by hand move with the text. `caret` is the
+   * caret position after the change: it tells where the change is when the text repeats.
+   */
+  setText(next: string, caret?: number): void {
     const text = next.slice(0, MAX_TEXT);
     const prev = this.doc.text;
     if (text === prev) return;
     const ov = $state.snapshot(this.doc.dotOverrides);
     if (Object.keys(ov).length) this.doc.dotOverrides = remapOverrides(prev, text, ov);
+    if (this.doc.colorRanges.length)
+      this.doc.colorRanges = shiftRanges($state.snapshot(this.doc.colorRanges), textEdit(prev, text, caret));
     this.doc.text = text;
+  }
+
+  /** Gives a text color to a part of the text, or gives it back to the automatic colors (null). */
+  paintText(span: Span, color: number | null): void {
+    this.doc.colorRanges = paintRange($state.snapshot(this.doc.colorRanges), span.start, span.end, color);
   }
 
   toggleDot(id: string): void {
@@ -98,16 +111,19 @@ export class AppState {
   );
 
   /**
-   * Adds a text color: the first suggested color that the list does not have. The second color
-   * also changes "One color" to "Each letter", so that the new color shows at once.
+   * Adds a text color: the first suggested color that the list does not have. Returns its index, or
+   * null when the list is full. With `showAtOnce`, the second color also changes "One color" to
+   * "Each letter", so that the new color shows at once.
    */
-  addColor(): void {
+  addColor(showAtOnce = true): number | null {
     const palette = this.doc.palette;
-    if (palette.length >= MAX_COLORS) return;
+    if (palette.length >= MAX_COLORS) return null;
     const used = new Set(palette.map((id) => id.toLowerCase()));
     const id = SUGGESTED_COLORS.find((c) => !used.has(c.toLowerCase())) ?? DMC_THREADS[palette.length]!.id;
     palette.push(id);
-    if (palette.length === 2 && this.doc.coloring.mode === 'single') this.doc.coloring.mode = 'letter';
+    if (showAtOnce && palette.length === 2 && this.doc.coloring.mode === 'single')
+      this.doc.coloring.mode = 'letter';
+    return palette.length - 1;
   }
 
   /** Removes a text color. The text that had this color by hand goes back to the automatic colors. */

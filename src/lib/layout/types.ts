@@ -73,6 +73,8 @@ export interface Placement {
   height: number;
   src: Span;
   line: number;
+  /** The text color of the glyph: an index in the text colors, or -1 when it has none. */
+  color: number;
 }
 
 export interface ResolvedDot {

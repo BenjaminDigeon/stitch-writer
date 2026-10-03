@@ -261,6 +261,7 @@ export function layout(
         height: p.line.above + p.line.below,
         src: it.src,
         line: placed.indexOf(p),
+        color: tokenColor[it.token] ?? -1,
         baseline: p.baseline,
       });
       if (it.kind === 'missing') {

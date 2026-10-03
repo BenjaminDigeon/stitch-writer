@@ -67,6 +67,10 @@
       disabled={app.doc.palette.length >= MAX_COLORS}
       onclick={() => app.addColor()}>+ Add a color</button
     >
+    <p class="hint">
+      To color a part by hand, select it in the text box, or click its letters in the chart (Shift + click
+      adds letters).
+    </p>
 
     {#if hasMotif}
       <DmcCombobox label="Motif fill" value={app.doc.accent} onchange={(v) => (app.doc.accent = v)} />
@@ -168,5 +172,11 @@
 
   .add {
     justify-self: start;
+  }
+
+  .hint {
+    margin: -4px 0 0;
+    font-size: 12px;
+    color: var(--muted);
   }
 </style>
