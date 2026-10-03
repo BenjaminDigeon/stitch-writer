@@ -13,7 +13,7 @@ import {
   type TextMeasure,
 } from '../scene/types.ts';
 import type { Thread } from '../threads/dmc.ts';
-import { describeRow, legendRows } from './legend.ts';
+import { describeRow, legendRows, type LegendRow } from './legend.ts';
 import type { Tile, TilePlan } from './tiling.ts';
 
 export interface PdfInput {
@@ -34,6 +34,8 @@ export interface PdfInput {
 }
 
 const GRAY: Rgb = [110, 110, 110];
+/** The most legend rows in one column. More rows go in two columns. */
+const LEGEND_ONE_COLUMN = 8;
 const LIGHT: Rgb = [235, 235, 235];
 const PT = 25.4 / 72;
 
@@ -347,21 +349,49 @@ function infoPage(input: PdfInput, m: TextMeasure, withTitle: boolean): ScenePag
   out.push({ t: 'text', x: M, y, text: 'Threads', size: 11 * PT, weight: 'bold' });
   y += 3;
   const rows = legendRows(chart, input.threads, input.fabric);
-  for (const r of rows) {
+  const swatches = (r: LegendRow, x: number, ry: number) => {
     const kind = r.full || r.half ? 'cell' : r.backstitches ? 'line' : 'knot';
-    out.push(...legendSwatch(M, y, 5, r.thread, input, kind));
-    if ((r.full || r.half) && r.backstitches) out.push(...legendSwatch(M + 6, y, 5, r.thread, input, 'line'));
-    out.push({ t: 'text', x: M + 13, y: y + 3.6, text: `DMC ${r.dmc.id}`, size, weight: 'bold' });
-    out.push({ t: 'text', x: M + 32, y: y + 3.6, text: r.dmc.name, size });
-    out.push({
-      t: 'text',
-      x: M + 80,
-      y: y + 3.6,
-      text: fitText(m, describeRow(r, units), size, W - 2 * M - 80),
-      size,
-      fill: GRAY,
+    out.push(...legendSwatch(x, ry, 5, r.thread, input, kind));
+    if ((r.full || r.half) && r.backstitches)
+      out.push(...legendSwatch(x + 6, ry, 5, r.thread, input, 'line'));
+  };
+  if (rows.length <= LEGEND_ONE_COLUMN) {
+    for (const r of rows) {
+      swatches(r, M, y);
+      out.push({ t: 'text', x: M + 13, y: y + 3.6, text: `DMC ${r.dmc.id}`, size, weight: 'bold' });
+      out.push({ t: 'text', x: M + 32, y: y + 3.6, text: r.dmc.name, size });
+      out.push({
+        t: 'text',
+        x: M + 80,
+        y: y + 3.6,
+        text: fitText(m, describeRow(r, units), size, W - 2 * M - 80),
+        size,
+        fill: GRAY,
+      });
+      y += 7;
+    }
+  } else {
+    // Two columns. Each row has the thread on one line and the stitch counts on the next line.
+    const gap = 6;
+    const colW = (W - 2 * M - gap) / 2;
+    const perColumn = Math.ceil(rows.length / 2);
+    const small = 7.5 * PT;
+    rows.forEach((r, i) => {
+      const x = M + (i < perColumn ? 0 : colW + gap);
+      const ry = y + (i % perColumn) * 9;
+      swatches(r, x, ry);
+      out.push({ t: 'text', x: x + 13, y: ry + 2.6, text: `DMC ${r.dmc.id}`, size, weight: 'bold' });
+      out.push({ t: 'text', x: x + 30, y: ry + 2.6, text: fitText(m, r.dmc.name, size, colW - 30), size });
+      out.push({
+        t: 'text',
+        x: x + 13,
+        y: ry + 6.4,
+        text: fitText(m, describeRow(r, units), small, colW - 13),
+        size: small,
+        fill: GRAY,
+      });
     });
-    y += 7;
+    y += perColumn * 9 + 2;
   }
   out.push({
     t: 'text',

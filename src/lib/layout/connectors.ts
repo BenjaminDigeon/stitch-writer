@@ -10,6 +10,8 @@ export interface PlacedGlyph {
   srcStart: number;
   /** False after a space, a motif or anything else that is not a letter of the same word. */
   joinsPrevious: boolean;
+  /** The chart thread of a font thread in this glyph. Without it, the dots keep the font thread. */
+  threadOf?: (fontThread: number) => number;
 }
 
 const isLetter = (g: Glyph) => (g.type === 'char' || g.type === 'ligature') && /\p{L}/u.test(g.key);
@@ -128,7 +130,7 @@ export function resolveConnectors(
         id,
         x: p.x + c.x,
         y: p.baseline + c.y,
-        thread: c.thread,
+        thread: p.threadOf ? p.threadOf(c.thread) : c.thread,
         auto: isAuto,
         active: ov ?? isAuto,
         overridden: ov !== undefined,
