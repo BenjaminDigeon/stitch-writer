@@ -1,0 +1,1 @@
+var e=new URL(`NotoSans-Regular-BRSqef3-.ttf`,import.meta.url).href,t=new URL(`NotoSans-Bold-BzLoLA2-.ttf`,import.meta.url).href,n=null;function r(){return n??=Promise.all([e,t].map(e=>fetch(e).then(e=>e.arrayBuffer()))).then(([e,t])=>({regular:new Uint8Array(e),bold:new Uint8Array(t)})),n.catch(()=>n=null),n}export{r as loadPdfFonts};
