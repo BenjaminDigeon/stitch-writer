@@ -123,6 +123,73 @@ test('a selection can get its own color, with undo and a shortcut', async ({ pag
   await expect(threadPaths).toHaveCount(2);
 });
 
+test('presets, reordering and the warning before a used color is removed', async ({ page }, info) => {
+  const rows = page.getByRole('list', { name: 'Text colors' }).getByRole('listitem');
+  const ids = () =>
+    rows
+      .locator('input[role="combobox"]')
+      .evaluateAll((els) => els.map((e) => (e as HTMLInputElement).title.split(' ')[1]));
+  const text = page.locator('#stitch-text');
+  await text.fill('Emma Tom');
+
+  await page.getByRole('button', { name: 'Rainbow' }).click();
+  await expect(rows).toHaveCount(7);
+  expect((await ids())[0]).toBe('666');
+  await page.getByRole('button', { name: 'Undo' }).click();
+  await expect(rows).toHaveCount(1);
+
+  await page.getByRole('button', { name: '+ Add a color' }).click();
+  await page.getByRole('button', { name: '+ Add a color' }).click();
+  expect(await ids()).toEqual(['3750', '3765', '3346']);
+
+  // "Emma" gets color 1 by hand. The part keeps DMC 3750 when the color moves.
+  await text.evaluate((el: HTMLTextAreaElement) => {
+    el.focus();
+    el.setSelectionRange(0, 4);
+  });
+  await page.keyboard.press('ControlOrMeta+Alt+Digit1');
+  await page.getByRole('button', { name: 'Move color 1', exact: true }).focus();
+  await page.keyboard.press('ArrowDown');
+  expect(await ids()).toEqual(['3765', '3750', '3346']);
+  await expect(page.getByRole('button', { name: 'Move color 2', exact: true })).toBeFocused();
+  await text.evaluate((el: HTMLTextAreaElement) => {
+    el.focus();
+    el.setSelectionRange(0, 4);
+  });
+  await expect(
+    page
+      .getByRole('toolbar', { name: 'Color of the selected text' })
+      .getByRole('button', { name: /^Color 2/ }),
+  ).toHaveAttribute('aria-pressed', 'true');
+
+  if (info.project.name !== 'mobile') {
+    // Drag color 3 to the top.
+    const handle = page.getByRole('button', { name: 'Move color 3', exact: true });
+    const first = await rows.first().boundingBox();
+    const box = await handle.boundingBox();
+    await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(box!.x + box!.width / 2, first!.y + 2, { steps: 8 });
+    await page.mouse.up();
+    expect(await ids()).toEqual(['3346', '3765', '3750']);
+  }
+
+  // DMC 3750 is set by hand on "Emma": removing it asks first.
+  const index = (await ids()).indexOf('3750');
+  let message = '';
+  page.once('dialog', (d) => {
+    message = d.message();
+    void d.dismiss();
+  });
+  await page.getByRole('button', { name: `Remove color ${index + 1}`, exact: true }).click();
+  expect(message).toContain('1 part of the text');
+  await expect(rows).toHaveCount(3);
+  page.once('dialog', (d) => void d.accept());
+  await page.getByRole('button', { name: `Remove color ${index + 1}`, exact: true }).click();
+  await expect(rows).toHaveCount(2);
+  expect(await ids()).not.toContain('3750');
+});
+
 test('the PDF export is a vector PDF with a cover and the chart pages', async ({ page }, info) => {
   test.skip(info.project.name === 'mobile', 'The download flow is the same on mobile.');
   await page.locator('#stitch-text').fill('Happy birthday :heart-01:');

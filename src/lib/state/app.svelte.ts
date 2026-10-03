@@ -5,6 +5,7 @@ import { customFontEntry, listCustomFonts } from '../font/custom-store.ts';
 import { MAX_COLORS, threadPlan, type ColorMode, type ColorSettings } from '../layout/color.ts';
 import { EMPTY_CHART, layout } from '../layout/layout.ts';
 import type { Span } from '../layout/types.ts';
+import { movedIndex, remapRangeColors, type ColorPreset } from '../layout/palette.ts';
 import { paintRange, shiftRanges, textEdit } from '../layout/ranges.ts';
 import { remapOverrides } from '../layout/remap.ts';
 import type { Rgb } from '../scene/types.ts';
@@ -131,10 +132,47 @@ export class AppState {
     const palette = this.doc.palette;
     if (palette.length <= 1 || index < 0 || index >= palette.length) return;
     palette.splice(index, 1);
-    this.doc.colorRanges = $state
-      .snapshot(this.doc.colorRanges)
-      .filter((r) => r.color !== index)
-      .map((r) => (r.color > index ? { ...r, color: r.color - 1 } : r));
+    this.doc.colorRanges = remapRangeColors($state.snapshot(this.doc.colorRanges), (c) =>
+      c === index ? null : c > index ? c - 1 : c,
+    );
+  }
+
+  /** The number of parts of the text that have this color by hand. */
+  partsWithColor(index: number): number {
+    return this.doc.colorRanges.filter((r) => r.color === index).length;
+  }
+
+  /** Moves a text color in the list. The parts colored by hand keep their color. */
+  moveColor(from: number, to: number): void {
+    const palette = this.doc.palette;
+    if (from === to || from < 0 || to < 0 || from >= palette.length || to >= palette.length) return;
+    const [id] = palette.splice(from, 1);
+    palette.splice(to, 0, id!);
+    this.doc.colorRanges = remapRangeColors($state.snapshot(this.doc.colorRanges), (c) =>
+      movedIndex(c, from, to),
+    );
+  }
+
+  /**
+   * Replaces the text colors with a preset. A part colored by hand keeps its color number when the
+   * preset has it. "One color" changes to "Each letter", so that the colors show at once.
+   * Returns a function that puts back the previous colors.
+   */
+  applyPreset(preset: ColorPreset): () => void {
+    const before = {
+      palette: $state.snapshot(this.doc.palette),
+      ranges: $state.snapshot(this.doc.colorRanges),
+      mode: this.doc.coloring.mode,
+    };
+    const count = preset.colors.length;
+    this.doc.palette = [...preset.colors];
+    this.doc.colorRanges = remapRangeColors(before.ranges, (c) => (c < count ? c : null));
+    if (this.doc.coloring.mode === 'single') this.doc.coloring.mode = 'letter';
+    return () => {
+      this.doc.palette = before.palette;
+      this.doc.colorRanges = before.ranges;
+      this.doc.coloring.mode = before.mode;
+    };
   }
 
   setColor(index: number, id: string): void {

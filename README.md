@@ -19,10 +19,15 @@ Use it online: **https://benjamindigeon.github.io/stitch-writer/**
   - a large chart is cut into pages, with overlap rows and columns;
   - grid numbers that continue across the pages;
   - a cover page with the sizes, a 50 mm calibration ruler, the thread legend and a page map.
-- Colors: up to 16 DMC colors for the text. The text has one color, or a new color for each
-  letter, each word or each line. Select a part of the text, or click its letters in the chart, to
-  give it a color by hand (⌘⌥1 to ⌘⌥9). The motifs have their own fill color. The chart shows color,
-  symbols (20 shapes, for black-and-white printing), or both. The legend has one row for each color.
+- Colors:
+  - up to 16 DMC colors for the text, or a preset (Rainbow, Pastel, Christmas). Drag a color, or use
+    the arrow keys on its handle, to change the order;
+  - one color for all the text, or a new color for each letter, each word or each line;
+  - colors by hand: select a part of the text, or click its letters in the chart, then pick a color
+    (⌘⌥1 to ⌘⌥9). The app asks before it removes a color that is set by hand;
+  - the motifs have their own fill color;
+  - the chart shows color, symbols (20 shapes, for black-and-white printing), or both. The legend has
+    one row for each color.
 - A fabric calculator: Aida 11–18, evenweave or linen over two, the finished size and the size of
   the fabric to cut.
 - A share link: the URL keeps the text and all the settings. The app also saves your work in the browser.
