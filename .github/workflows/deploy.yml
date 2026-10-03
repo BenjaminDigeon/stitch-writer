@@ -10,10 +10,12 @@ on:
 permissions:
   contents: read
 
-# One run at a time for each branch. A new push cancels a running pull request run,
-# but never a deployment of main.
+# One run at a time for each pull request and for each branch. A new event of a pull request
+# cancels its running run, but never a deployment of main. The group of a pull request uses its
+# number: when a pull request is merged, its "closed" run gets the ref of the base branch, so a
+# group by ref would cancel the push run of main.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 # GitHub Pages serves the "gh-pages" branch:
