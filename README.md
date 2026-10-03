@@ -98,5 +98,5 @@ A font is a JSON file (`*.font.json`, schema `stitch-writer/font`, version 1):
 
 ## Licences
 
-The code of this project has no licence file yet. The third-party data and fonts have their own
-licences: see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+The code of this project is under the MIT licence: see [LICENSE](LICENSE). The third-party data
+and fonts have their own licences: see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
