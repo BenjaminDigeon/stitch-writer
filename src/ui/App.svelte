@@ -106,8 +106,8 @@
     }
   }
 
-  function selectRange(span: Span) {
-    input?.select(span);
+  function selectRange(span: Span, extend: boolean) {
+    input?.select(span, extend);
   }
 </script>
 

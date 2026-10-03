@@ -20,7 +20,8 @@ Use it online: **https://benjamindigeon.github.io/stitch-writer/**
   - grid numbers that continue across the pages;
   - a cover page with the sizes, a 50 mm calibration ruler, the thread legend and a page map.
 - Colors: up to 16 DMC colors for the text. The text has one color, or a new color for each
-  letter, each word or each line. The motifs have their own fill color. The chart shows color,
+  letter, each word or each line. Select a part of the text, or click its letters in the chart, to
+  give it a color by hand (⌘⌥1 to ⌘⌥9). The motifs have their own fill color. The chart shows color,
   symbols (20 shapes, for black-and-white printing), or both. The legend has one row for each color.
 - A fabric calculator: Aida 11–18, evenweave or linen over two, the finished size and the size of
   the fabric to cut.

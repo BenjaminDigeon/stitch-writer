@@ -7,8 +7,10 @@
   import { renderSvgFragment } from '../lib/scene/svg-backend.ts';
   import { fitViewport, zoomAt, type Viewport } from '../lib/state/viewport.ts';
 
-  let { onselectrange, loading = false }: { onselectrange: (span: Span) => void; loading?: boolean } =
-    $props();
+  let {
+    onselectrange,
+    loading = false,
+  }: { onselectrange: (span: Span, extend: boolean) => void; loading?: boolean } = $props();
   const app = getContext<AppState>('app');
 
   let w = $state(0);
@@ -123,7 +125,7 @@
       return;
     }
     const hit = placementAt(p.x, p.y);
-    if (hit && matchMedia('(pointer: fine)').matches) onselectrange(hit.src);
+    if (hit && matchMedia('(pointer: fine)').matches) onselectrange(hit.src, e.shiftKey);
   }
 
   const wheel: Attachment<HTMLDivElement> = (el) => {

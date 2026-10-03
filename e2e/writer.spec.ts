@@ -76,6 +76,53 @@ test('each letter or each word can have its own color', async ({ page }) => {
   await expect(page.getByRole('radio', { name: 'Each word' })).toBeChecked();
 });
 
+test('a selection can get its own color, with undo and a shortcut', async ({ page }) => {
+  const text = page.locator('#stitch-text');
+  const threadPaths = page.locator('svg.chart path[class^="thread-"]');
+  const bar = page.getByRole('toolbar', { name: 'Color of the selected text' });
+  const select = (start: number, end: number) =>
+    text.evaluate(
+      (el: HTMLTextAreaElement, [s, e]) => {
+        el.focus();
+        el.setSelectionRange(s!, e!);
+      },
+      [start, end],
+    );
+
+  await text.fill('Emma Tom');
+  await page.getByRole('button', { name: '+ Add a color' }).click();
+  await page.getByRole('radio', { name: 'One color' }).check({ force: true });
+  await expect(threadPaths).toHaveCount(1);
+
+  await select(5, 8);
+  await expect(bar).toContainText('“Tom”');
+  await bar.getByRole('button', { name: /^Color 2/ }).click();
+  await expect(threadPaths).toHaveCount(2);
+  await expect(page.locator('.mirror mark.colored')).toHaveCount(2);
+  await expect(bar.getByRole('button', { name: /^Color 2/ })).toHaveAttribute('aria-pressed', 'true');
+
+  await page.keyboard.press('ControlOrMeta+z');
+  await expect(threadPaths).toHaveCount(1);
+  await page.keyboard.press('ControlOrMeta+Shift+z');
+  await expect(threadPaths).toHaveCount(2);
+
+  // Text typed just after the colored part takes its color.
+  const rows = page.getByRole('list', { name: 'Text colors' }).getByRole('listitem');
+  const before = Number(await rows.nth(1).locator('.count').innerText());
+  await text.evaluate((el: HTMLTextAreaElement) => el.setSelectionRange(8, 8));
+  await page.keyboard.type('my');
+  await expect(text).toHaveValue('Emma Tommy');
+  await expect
+    .poll(async () => Number(await rows.nth(1).locator('.count').innerText()))
+    .toBeGreaterThan(before);
+
+  await select(0, 4);
+  await page.keyboard.press('ControlOrMeta+Alt+Digit2');
+  await expect(threadPaths).toHaveCount(1);
+  await page.keyboard.press('ControlOrMeta+Alt+Digit0');
+  await expect(threadPaths).toHaveCount(2);
+});
+
 test('the PDF export is a vector PDF with a cover and the chart pages', async ({ page }, info) => {
   test.skip(info.project.name === 'mobile', 'The download flow is the same on mobile.');
   await page.locator('#stitch-text').fill('Happy birthday :heart-01:');
