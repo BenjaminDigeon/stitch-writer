@@ -4,6 +4,7 @@
   import { readStartupDoc, shareUrl, startPersistence } from '../lib/state/persist.svelte.ts';
   import { DEFAULTS_V1, type Doc } from '../lib/state/doc.ts';
   import type { Span } from '../lib/layout/types.ts';
+  import PreviewBanner from './PreviewBanner.svelte';
   import TextInput from './TextInput.svelte';
   import FontPicker from './FontPicker.svelte';
   import SettingsPanel from './SettingsPanel.svelte';
@@ -112,6 +113,7 @@
 <svelte:window onkeydown={onKeydown} />
 
 <div class="shell">
+  <PreviewBanner />
   <header class="topbar">
     <div class="brand">
       <svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"
@@ -159,8 +161,8 @@
 
 <style>
   .shell {
-    display: grid;
-    grid-template-rows: auto 1fr auto;
+    display: flex;
+    flex-direction: column;
     height: 100%;
   }
 
@@ -196,6 +198,7 @@
   }
 
   .workspace {
+    flex: 1;
     display: grid;
     grid-template-columns: minmax(300px, 380px) 1fr;
     min-height: 0;
