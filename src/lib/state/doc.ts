@@ -46,7 +46,7 @@ export const DEFAULTS_V1: Readonly<DocV1> = Object.freeze({
   layout: { ...DEFAULT_LAYOUT },
   dotOverrides: {},
   threads: [DEFAULT_THREAD_IDS.main, DEFAULT_THREAD_IDS.accent],
-  display: 'colour',
+  display: 'color',
   fabric: { ...DEFAULT_FABRIC },
   pdf: {
     paper: 'a4',
@@ -77,7 +77,10 @@ const oneOf = <T extends string>(v: unknown, list: readonly T[], d: T): T =>
   list.includes(v as T) ? (v as T) : d;
 const bool = (v: unknown, d: boolean) => (typeof v === 'boolean' ? v : d);
 
-/** Checks and clamps each field. An invalid field gets its default value. */
+/**
+ * Checks and clamps each field. An invalid field gets its default value. The British values of
+ * older documents ("centre", "colour") become "center" and "color".
+ */
 export function sanitizeDoc(raw: unknown, defaults: Doc = DEFAULTS_V1): Doc {
   const r = isObj(raw) ? raw : {};
   const l = isObj(r.layout) ? r.layout : {};
@@ -98,7 +101,11 @@ export function sanitizeDoc(raw: unknown, defaults: Doc = DEFAULTS_V1): Doc {
       letterSpacing:
         l.letterSpacing === null ? null : num(l.letterSpacing, d.layout.letterSpacing ?? 0, 0, 10, true),
       lineSpacing: num(l.lineSpacing, d.layout.lineSpacing, 0, 20, true),
-      align: oneOf(l.align, ['left', 'centre', 'right'] as const, d.layout.align),
+      align: oneOf(
+        l.align === 'centre' ? 'center' : l.align,
+        ['left', 'center', 'right'] as const,
+        d.layout.align,
+      ),
       padding: num(l.padding, d.layout.padding, 0, 50, true),
       ligatures: bool(l.ligatures, d.layout.ligatures),
       substitute: bool(l.substitute, d.layout.substitute),
@@ -109,7 +116,11 @@ export function sanitizeDoc(raw: unknown, defaults: Doc = DEFAULTS_V1): Doc {
       Array.isArray(r.threads) && r.threads.every((t) => typeof t === 'string')
         ? (r.threads as string[]).slice(0, 8)
         : [...d.threads],
-    display: oneOf(r.display, ['colour', 'symbol', 'both'] as const, d.display),
+    display: oneOf(
+      r.display === 'colour' ? 'color' : r.display,
+      ['color', 'symbol', 'both'] as const,
+      d.display,
+    ),
     fabric: {
       count: num(f.count, d.fabric.count, 6, 60),
       overTwo: bool(f.overTwo, d.fabric.overTwo),

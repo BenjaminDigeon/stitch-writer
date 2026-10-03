@@ -1,7 +1,7 @@
 /**
  * A device-independent drawing. The SVG back end (preview, SVG download) and the PDF back end draw
  * the same scene, so the preview and the PDF are the same. Units are free: cells for the preview,
- * millimetres for the export. The origin is top-left, and y goes down.
+ * millimeters for the export. The origin is top-left, and y goes down.
  */
 
 export type Rgb = readonly [number, number, number];
@@ -35,7 +35,7 @@ export type SceneNode =
       fillRule?: 'nonzero' | 'evenodd';
       className?: string;
     }
-  | { t: 'circles'; r: number; centres: number[]; fill: Rgb; className?: string }
+  | { t: 'circles'; r: number; centers: number[]; fill: Rgb; className?: string }
   | {
       t: 'text';
       x: number;
@@ -100,5 +100,5 @@ export function luminance([r, g, b]: Rgb): number {
   return 0.2126 * ch(r) + 0.7152 * ch(g) + 0.0722 * ch(b);
 }
 
-/** Black or white, whichever is easier to read on the colour. */
+/** Black or white, whichever is easier to read on the color. */
 export const contrastOn = (c: Rgb): Rgb => (luminance(c) > 0.179 ? BLACK : WHITE);

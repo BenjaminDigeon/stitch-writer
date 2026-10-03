@@ -22,7 +22,7 @@ export interface PdfInput {
   fontName: string;
   fontCredit?: string;
   threads: readonly Thread[];
-  threadColour: (t: number) => Rgb;
+  threadColor: (t: number) => Rgb;
   mode: RenderMode;
   fabric: FabricSettings;
   fabricSize: FabricSize;
@@ -33,7 +33,7 @@ export interface PdfInput {
   credits: string[];
 }
 
-const GREY: Rgb = [110, 110, 110];
+const GRAY: Rgb = [110, 110, 110];
 const LIGHT: Rgb = [235, 235, 235];
 const PT = 25.4 / 72;
 
@@ -76,7 +76,7 @@ function chartPage(input: PdfInput, tile: Tile, total: number, m: TextMeasure): 
     y: M + 9,
     text: `Columns ${tile.x0 + 1}–${tile.x1} · Rows ${tile.y0 + 1}–${tile.y1}`,
     size: small,
-    fill: GREY,
+    fill: GRAY,
   });
   if (plan.tiles.length > 1) {
     const mapX = page.w - M - mapW;
@@ -87,8 +87,8 @@ function chartPage(input: PdfInput, tile: Tile, total: number, m: TextMeasure): 
         y: M + 6 + t.row * 2.2,
         w: 3,
         h: 2,
-        fill: t === tile ? input.threadColour(0) : LIGHT,
-        stroke: { color: GREY, width: 0.1 },
+        fill: t === tile ? input.threadColor(0) : LIGHT,
+        stroke: { color: GRAY, width: 0.1 },
       });
     }
   }
@@ -101,7 +101,7 @@ function chartPage(input: PdfInput, tile: Tile, total: number, m: TextMeasure): 
     inner.push({ t: 'rect', x: tile.x0 * s, y: tile.y0 * s, w: tile.overlapLeft * s, h, fill: LIGHT });
   if (tile.overlapTop)
     inner.push({ t: 'rect', x: tile.x0 * s, y: tile.y0 * s, w, h: tile.overlapTop * s, fill: LIGHT });
-  inner.push(...buildChartLayer(chart, printStyle(s, input.mode, input.threadColour), tile));
+  inner.push(...buildChartLayer(chart, printStyle(s, input.mode, input.threadColor), tile));
   const dash = { color: [90, 90, 90] as Rgb, width: 0.3, dash: [1, 0.8] };
   if (tile.overlapLeft)
     inner.push({
@@ -139,7 +139,7 @@ function chartPage(input: PdfInput, tile: Tile, total: number, m: TextMeasure): 
       text: String(v),
       size: g.label,
       anchor: 'middle',
-      fill: GREY,
+      fill: GRAY,
     });
   }
   for (let v = Math.ceil(tile.y0 / 10) * 10; v <= tile.y1; v += 10) {
@@ -151,14 +151,14 @@ function chartPage(input: PdfInput, tile: Tile, total: number, m: TextMeasure): 
       text: String(v),
       size: g.label,
       anchor: 'end',
-      fill: GREY,
+      fill: GRAY,
     });
   }
 
-  // Centre arrows in the gutters.
+  // Center arrows in the gutters.
   const arrow: Rgb = [200, 30, 60];
-  const cx = chart.centre.x;
-  const cy = chart.centre.y;
+  const cx = chart.center.x;
+  const cy = chart.center.y;
   if (cx >= tile.x0 && cx <= tile.x1) {
     const x = area.x + (cx - tile.x0) * s;
     out.push({
@@ -209,15 +209,15 @@ function chartPage(input: PdfInput, tile: Tile, total: number, m: TextMeasure): 
   // Footer.
   const fy = page.h - M - 1;
   const note =
-    tile.overlapLeft || tile.overlapTop ? 'Grey rows and columns repeat from the page before. ' : '';
-  out.push({ t: 'text', x: M, y: fy, text: `${note}Print at 100 % (actual size).`, size: small, fill: GREY });
+    tile.overlapLeft || tile.overlapTop ? 'Gray rows and columns repeat from the page before. ' : '';
+  out.push({ t: 'text', x: M, y: fy, text: `${note}Print at 100 % (actual size).`, size: small, fill: GRAY });
   out.push({
     t: 'text',
     x: page.w - M,
     y: fy,
     text: 'Stitch Writer',
     size: small,
-    fill: GREY,
+    fill: GRAY,
     anchor: 'end',
   });
   return { w: page.w, h: page.h, children: out };
@@ -231,9 +231,9 @@ function legendSwatch(
   input: PdfInput,
   kind: 'cell' | 'line' | 'knot',
 ): SceneNode[] {
-  const color = input.threadColour(thread);
+  const color = input.threadColor(thread);
   const out: SceneNode[] = [
-    { t: 'rect', x, y, w: size, h: size, fill: [255, 255, 255], stroke: { color: GREY, width: 0.15 } },
+    { t: 'rect', x, y, w: size, h: size, fill: [255, 255, 255], stroke: { color: GRAY, width: 0.15 } },
   ];
   if (kind === 'line') {
     out.push({
@@ -247,11 +247,11 @@ function legendSwatch(
     return out;
   }
   if (kind === 'knot') {
-    out.push({ t: 'circles', r: size * 0.25, centres: [x + size / 2, y + size / 2], fill: color });
+    out.push({ t: 'circles', r: size * 0.25, centers: [x + size / 2, y + size / 2], fill: color });
     return out;
   }
   if (input.mode !== 'symbol') out.push({ t: 'rect', x, y, w: size, h: size, fill: color });
-  if (input.mode !== 'colour') {
+  if (input.mode !== 'color') {
     const shape = symbolForThread(thread);
     const ink = input.mode === 'both' ? contrastOn(color) : BLACK;
     const ops: PathOp[] = shape.ops(x, y, size);
@@ -289,7 +289,7 @@ function infoPage(input: PdfInput, m: TextMeasure, withTitle: boolean): ScenePag
       y,
       text: `${input.fontName} · cross-stitch chart · made with Stitch Writer`,
       size: 9 * PT,
-      fill: GREY,
+      fill: GRAY,
     });
     y += 10;
   } else {
@@ -316,7 +316,7 @@ function infoPage(input: PdfInput, m: TextMeasure, withTitle: boolean): ScenePag
     ],
     ['Stitches', chart.stats.total.toLocaleString('en')],
     ['Chart pages', `${plan.tiles.length} (${plan.nx} × ${plan.ny}), ${plan.cellMm.toFixed(1)} mm per cell`],
-    ['Start', 'at the centre of the fabric: the red arrows show the centre of the chart.'],
+    ['Start', 'at the center of the fabric: the red arrows show the center of the chart.'],
   ];
   const size = 9 * PT;
   for (const [k, v] of facts) {
@@ -339,7 +339,7 @@ function infoPage(input: PdfInput, m: TextMeasure, withTitle: boolean): ScenePag
     y: y + 0.2,
     text: '50 mm. Measure this line to check that the print is at 100 %.',
     size: 8 * PT,
-    fill: GREY,
+    fill: GRAY,
   });
   y += 9;
 
@@ -359,7 +359,7 @@ function infoPage(input: PdfInput, m: TextMeasure, withTitle: boolean): ScenePag
       y: y + 3.6,
       text: fitText(m, describeRow(r, units), size, W - 2 * M - 80),
       size,
-      fill: GREY,
+      fill: GRAY,
     });
     y += 7;
   }
@@ -369,7 +369,7 @@ function infoPage(input: PdfInput, m: TextMeasure, withTitle: boolean): ScenePag
     y: y + 1,
     text: 'Use 2 strands for cross stitches on Aida 14 to 16, and 1 strand for backstitches.',
     size: 8 * PT,
-    fill: GREY,
+    fill: GRAY,
   });
   y += 9;
 
@@ -389,7 +389,7 @@ function infoPage(input: PdfInput, m: TextMeasure, withTitle: boolean): ScenePag
     if (boxH > 20) {
       const k = Math.min(boxW / chart.width, boxH / chart.height);
       const thumb = buildChartLayer(chart, {
-        ...printStyle(k, 'colour', input.threadColour),
+        ...printStyle(k, 'color', input.threadColor),
         minor: { color: [255, 255, 255], width: 0 },
         major: { color: [200, 200, 200], width: 0.1 },
         backWidth: Math.max(0.2, k * 0.2),
@@ -428,7 +428,7 @@ function infoPage(input: PdfInput, m: TextMeasure, withTitle: boolean): ScenePag
   // Credits.
   let cy = H - M - 1 - (input.credits.length - 1) * 3.2;
   for (const line of input.credits) {
-    out.push({ t: 'text', x: M, y: cy, text: fitText(m, line, 7 * PT, W - 2 * M), size: 7 * PT, fill: GREY });
+    out.push({ t: 'text', x: M, y: cy, text: fitText(m, line, 7 * PT, W - 2 * M), size: 7 * PT, fill: GRAY });
     cy += 3.2;
   }
   return { w: W, h: H, children: out };

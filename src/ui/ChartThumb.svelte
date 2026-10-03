@@ -6,18 +6,18 @@
 
   let {
     chart,
-    colour,
+    color,
     height = 40,
     maxWidth = 260,
-  }: { chart: Chart; colour: (t: number) => Rgb; height?: number; maxWidth?: number } = $props();
+  }: { chart: Chart; color: (t: number) => Rgb; height?: number; maxWidth?: number } = $props();
 
   const none = { color: [0, 0, 0] as Rgb, width: 0 };
   const markup = $derived.by(() => {
     if (!chart.width) return '';
     const nodes = buildChartLayer(chart, {
       cell: 1,
-      mode: 'colour',
-      threadColour: colour,
+      mode: 'color',
+      threadColor: color,
       minor: none,
       major: none,
       border: none,

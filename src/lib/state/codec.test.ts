@@ -42,6 +42,17 @@ describe('share link codec', () => {
     expect(r.ok && r.doc.text).toBe('Hello world');
   });
 
+  it('reads the British values of older documents', () => {
+    // Other defaults, so that the result does not come from the defaults.
+    const defaults = {
+      ...DEFAULTS_V1,
+      display: 'both' as const,
+      layout: { ...DEFAULTS_V1.layout, align: 'left' as const },
+    };
+    const d = sanitizeDoc({ layout: { align: 'centre' }, display: 'colour' }, defaults);
+    expect([d.layout.align, d.display]).toEqual(['center', 'color']);
+  });
+
   it('clamps invalid fields', () => {
     const d = sanitizeDoc({ text: 42, layout: { wordSpace: 9, align: 'up' }, pdf: { cellMm: -1 } });
     expect(d.text).toBe('');

@@ -60,7 +60,7 @@ describe('BDF import', () => {
     expect(f.glyphs.g!.top).toBe(-3);
     expect(f.glyphs['space-1']).toEqual({ type: 'space', width: 3 });
     expect(f.metrics).toMatchObject({ ascent: 5, descent: 1, letterSpacing: 0 });
-    expect(f.source.licence).toBe('Public domain');
+    expect(f.source.license).toBe('Public domain');
   });
 
   it('gives a usable font', () => {

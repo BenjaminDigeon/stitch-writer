@@ -1,8 +1,8 @@
-import { cellsToRows, normaliseGlyph, rowsToCells } from './normalise.ts';
+import { cellsToRows, normalizeGlyph, rowsToCells } from './normalize.ts';
 import { segmentsToPolylines, type LatticeSegment } from './polyline.ts';
 import type { GlyphDef } from './schema.ts';
 
-/** Pure edits of a glyph. Each function returns a new, normalised glyph. */
+/** Pure edits of a glyph. Each function returns a new, normalized glyph. */
 
 const key = (x: number, y: number) => `${x},${y}`;
 
@@ -17,7 +17,7 @@ function withCells(def: GlyphDef, map: Map<string, string>): GlyphDef {
   });
   const packed = cellsToRows(def.width, cells);
   const { top: _t, left: _l, rows: _r, ...rest } = def;
-  return normaliseGlyph(
+  return normalizeGlyph(
     packed ? { ...rest, top: packed.top, left: packed.left || undefined, rows: packed.rows } : rest,
   );
 }
@@ -46,7 +46,7 @@ const sameSeg = (a: LatticeSegment, b: LatticeSegment) =>
 function withSegments(def: GlyphDef, segs: LatticeSegment[]): GlyphDef {
   const lines = segmentsToPolylines(segs).map((pts) => ({ pts }));
   const { lines: _l, ...rest } = def;
-  return normaliseGlyph(lines.length ? { ...rest, lines } : rest);
+  return normalizeGlyph(lines.length ? { ...rest, lines } : rest);
 }
 
 /** Adds the segment, or removes it when the glyph already has it. */
@@ -65,7 +65,7 @@ export function toggleKnot(def: GlyphDef, x: number, y: number): GlyphDef {
   if (i >= 0) knots.splice(i, 1);
   else knots.push({ x, y });
   const { knots: _k, ...rest } = def;
-  return normaliseGlyph(knots.length ? { ...rest, knots } : rest);
+  return normalizeGlyph(knots.length ? { ...rest, knots } : rest);
 }
 
 export function shiftGlyph(def: GlyphDef, dx: number, dy: number): GlyphDef {
@@ -80,11 +80,11 @@ export function shiftGlyph(def: GlyphDef, dx: number, dy: number): GlyphDef {
   const knots = (def.knots ?? []).map((k) => ({ ...k, x: k.x + dx, y: k.y + dy }));
   const withLines = withSegments(moved, segs);
   const { knots: _k, ...rest } = withLines;
-  return normaliseGlyph(knots.length ? { ...rest, knots } : rest);
+  return normalizeGlyph(knots.length ? { ...rest, knots } : rest);
 }
 
 export function resizeGlyph(def: GlyphDef, width: number): GlyphDef {
-  return normaliseGlyph({ ...def, width: Math.max(0, Math.min(60, Math.round(width))) });
+  return normalizeGlyph({ ...def, width: Math.max(0, Math.min(60, Math.round(width))) });
 }
 
 export function clearGlyph(def: GlyphDef): GlyphDef {

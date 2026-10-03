@@ -1,4 +1,4 @@
-import { ACSF_FONTS, ACSF_LICENCE } from '../lib/font/acsf.ts';
+import { ACSF_FONTS, ACSF_LICENSE } from '../lib/font/acsf.ts';
 import { parseBdf } from '../lib/font/bdf.ts';
 import {
   deleteCustomFont,
@@ -9,7 +9,7 @@ import {
   type CustomFontRecord,
 } from '../lib/font/custom-store.ts';
 import { loadFont, type Font, type Glyph } from '../lib/font/font.ts';
-import { serializeFont } from '../lib/font/normalise.ts';
+import { serializeFont } from '../lib/font/normalize.ts';
 import { BUILTIN_FONTS, loadMotifLibrary } from '../lib/font/registry.ts';
 import {
   DEFAULT_SYMBOLS,
@@ -21,7 +21,7 @@ import {
   type GlyphDef,
   type GlyphType,
 } from '../lib/font/schema.ts';
-import { validateFont } from '../lib/font/validate.ts';
+import { upgradeFontFile, validateFont } from '../lib/font/validate.ts';
 
 export type Tool = 'X' | 'O' | 'o' | '/' | 'N' | 'erase' | 'line' | 'knot';
 
@@ -46,7 +46,7 @@ export function blankFont(id: string, name: string): FontFile {
     threads: [...DEFAULT_THREADS],
     symbols: { ...DEFAULT_SYMBOLS },
     glyphs,
-    source: { origin: 'handmade', licence: 'All rights reserved by the author of the font.' },
+    source: { origin: 'handmade', license: 'All rights reserved by the author of the font.' },
   };
 }
 
@@ -68,7 +68,7 @@ export class EditorState {
   glyphKey = $state<string | null>(null);
   tool = $state<Tool>('X');
   sample = $state('The quick brown fox jumps over the lazy dog');
-  neighbours = $state('n');
+  neighbors = $state('n');
   motifs = $state.raw<ReadonlyMap<string, Glyph>>(new Map());
   status = $state<'idle' | 'saving' | 'saved' | 'error'>('idle');
   message = $state<string | null>(null);
@@ -156,17 +156,17 @@ export class EditorState {
       ]);
       // The SIL OFL does not allow the reserved font name on a changed font: the copy gets another name.
       const name = `${acsf.name.replace(/^ACSF /, '')} (my copy)`;
-      file = ttfToFontFile(new Uint8Array(bytes), { id, name, licence: `${ACSF_LICENCE} Changed copy.` });
+      file = ttfToFontFile(new Uint8Array(bytes), { id, name, license: `${ACSF_LICENSE} Changed copy.` });
       file.source = {
         origin: 'handmade',
         basedOn: `${acsf.name} (SIL Open Font License 1.1)`,
-        licence: `SIL Open Font License 1.1. Based on ${acsf.name}. ${ACSF_LICENCE}`,
+        license: `SIL Open Font License 1.1. Based on ${acsf.name}. ${ACSF_LICENSE}`,
       };
     } else {
       const font = await entry.load();
       file = clone(font.file);
       file.name = `${font.name} (my copy)`;
-      file.source = { origin: 'handmade', basedOn: font.name, licence: font.licence };
+      file.source = { origin: 'handmade', basedOn: font.name, license: font.license };
     }
     file.id = id;
     file.kind = kindOf(file);
@@ -183,7 +183,7 @@ export class EditorState {
     const base = f.name.replace(/\.(font\.json|json|bdf|ttf|otf)$/i, '');
     try {
       if (lower.endsWith('.json')) {
-        const raw = JSON.parse(await f.text()) as unknown;
+        const raw = upgradeFontFile(JSON.parse(await f.text()) as unknown);
         const issues = validateFont(raw);
         if (issues.length)
           throw new Error(
@@ -206,13 +206,13 @@ export class EditorState {
         ]);
         const fk = openFont(bytes);
         detectTtfGrid(fk);
-        const licence = fk.copyright ?? 'See the licence of the font file.';
+        const license = fk.copyright ?? 'See the license of the font file.';
         await this.addRecord({
           type: 'ttf',
           id,
           name: fk.familyName || base,
           bytes,
-          licence,
+          license,
           updatedAt: Date.now(),
         });
       } else {
@@ -230,8 +230,8 @@ export class EditorState {
     if (!rec) return;
     const { ttfToFontFile } = await import('../lib/font/ttf.ts');
     const id = newCustomId();
-    const file = ttfToFontFile(rec.bytes, { id, name: `${rec.name} (editable)`, licence: rec.licence });
-    file.source = { origin: 'handmade', basedOn: rec.name, licence: rec.licence };
+    const file = ttfToFontFile(rec.bytes, { id, name: `${rec.name} (editable)`, license: rec.license });
+    file.source = { origin: 'handmade', basedOn: rec.name, license: rec.license };
     await this.addRecord({ type: 'json', id, name: file.name, file, updatedAt: Date.now() });
   }
 

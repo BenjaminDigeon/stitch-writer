@@ -11,17 +11,17 @@
   const cells = $derived(cellMap(glyph));
   const segs = $derived(segmentsOf(glyph));
 
-  const neighbour = $derived(ed.neighbours ? (file.glyphs[ed.neighbours] ?? null) : null);
+  const neighbor = $derived(ed.neighbors ? (file.glyphs[ed.neighbors] ?? null) : null);
   const ls = $derived(m.letterSpacing);
 
-  // The visible range: the advance box, the neighbours, any overhang and a margin of 1 cell.
-  const leftW = $derived(neighbour ? neighbour.width + ls : 0);
+  // The visible range: the advance box, the neighbors, any overhang and a margin of 1 cell.
+  const leftW = $derived(neighbor ? neighbor.width + ls : 0);
   const minCellX = $derived(
     Math.min(-1 - leftW, ...[...cells.keys()].map((k) => Number(k.split(',')[0]) - 1)),
   );
   const maxCellX = $derived(
     Math.max(
-      glyph.width + (neighbour ? ls + neighbour.width : 0),
+      glyph.width + (neighbor ? ls + neighbor.width : 0),
       ...[...cells.keys()].map((k) => Number(k.split(',')[0]) + 1),
     ),
   );
@@ -39,7 +39,7 @@
   const px = (x: number) => (x - minCellX) * CS;
   const py = (y: number) => (y - minCellY) * CS;
 
-  const colour = (sym: string) => (file.symbols[sym]?.thread === 1 ? '#e05a7a' : '#384c5e');
+  const color = (sym: string) => (file.symbols[sym]?.thread === 1 ? '#e05a7a' : '#384c5e');
 
   function ghostCells(def: GlyphDef | null, dx: number) {
     if (!def) return [];
@@ -48,7 +48,7 @@
       return { x: x + dx, y };
     });
   }
-  const ghosts = $derived([...ghostCells(neighbour, -leftW), ...ghostCells(neighbour, glyph.width + ls)]);
+  const ghosts = $derived([...ghostCells(neighbor, -leftW), ...ghostCells(neighbor, glyph.width + ls)]);
 
   let svg: SVGSVGElement | undefined = $state();
   let strokeMode: 'paint' | 'erase' | null = null;
@@ -225,18 +225,18 @@
     {@const [x, y] = k.split(',').map(Number) as [number, number]}
     {@const s = file.symbols[sym]}
     {#if s?.type === 'half'}
-      <path d={shape(sym, x, y)} fill={colour(sym)} />
+      <path d={shape(sym, x, y)} fill={color(sym)} />
     {:else if s?.type === 'full' && s.optional}
       <circle
         cx={px(x) + CS / 2}
         cy={py(y) + CS / 2}
         r={CS * 0.22}
         fill="none"
-        stroke={colour(sym)}
+        stroke={color(sym)}
         stroke-width="3"
       />
     {:else}
-      <rect x={px(x) + 1} y={py(y) + 1} width={CS - 2} height={CS - 2} fill={colour(sym)} rx="2" />
+      <rect x={px(x) + 1} y={py(y) + 1} width={CS - 2} height={CS - 2} fill={color(sym)} rx="2" />
       <path
         d="M{px(x) + 7} {py(y) + 7}L{px(x) + CS - 7} {py(y) + CS - 7}M{px(x) + CS - 7} {py(y) + 7}L{px(x) +
           7} {py(y) + CS - 7}"

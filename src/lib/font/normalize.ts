@@ -79,7 +79,7 @@ export function canonicalLines(lines: readonly GlyphLine[]): GlyphLine[] {
 }
 
 /** Trims empty rows, removes empty fields and orders the lines. The result is stable. */
-export function normaliseGlyph(def: GlyphDef): GlyphDef {
+export function normalizeGlyph(def: GlyphDef): GlyphDef {
   const out: GlyphDef = { type: def.type, width: def.width };
   const cells = rowsToCells(def);
   const rows = cellsToRows(def.width, cells);

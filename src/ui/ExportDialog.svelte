@@ -51,10 +51,10 @@
 
   function credits(): string[] {
     const out = [];
-    if (app.font?.origin === 'imported' && app.font.licence)
-      out.push(`Font: ${app.font.name}. ${app.font.licence}`);
+    if (app.font?.origin === 'imported' && app.font.license)
+      out.push(`Font: ${app.font.name}. ${app.font.license}`);
     out.push(
-      `${DMC_CREDIT}. DMC is a trademark of its owner. The colours on screen and on paper are approximations.`,
+      `${DMC_CREDIT}. DMC is a trademark of its owner. The colors on screen and on paper are approximations.`,
     );
     out.push('Made with Stitch Writer. Text font: Noto Sans (SIL Open Font License 1.1).');
     return out;
@@ -75,7 +75,7 @@
         title,
         fontName: app.font?.name ?? '',
         threads: app.threads,
-        threadColour: app.threadColour,
+        threadColor: app.threadColor,
         mode: app.doc.display,
         fabric: app.doc.fabric,
         fabricSize: app.fabric,
@@ -121,7 +121,7 @@
       chart: app.chart,
       title,
       threads: app.threads,
-      threadColour: app.threadColour,
+      threadColor: app.threadColor,
       mode: app.doc.display,
       fabric: app.doc.fabric,
       fabricSize: app.fabric,
@@ -276,7 +276,7 @@
         <fieldset class="field">
           <legend class="label">Show</legend>
           <div class="segmented">
-            {#each [['colour', 'Colour'], ['symbol', 'Symbols (black and white)'], ['both', 'Both']] as const as [v, n] (v)}
+            {#each [['color', 'Color'], ['symbol', 'Symbols (black and white)'], ['both', 'Both']] as const as [v, n] (v)}
               <label
                 ><input
                   type="radio"
@@ -327,7 +327,7 @@
       </footer>
     {:else if tab === 'svg'}
       <p class="lead">
-        One SVG page with the full chart. The size is in millimetres, so it prints at the correct size from a
+        One SVG page with the full chart. The size is in millimeters, so it prints at the correct size from a
         vector editor.
       </p>
       <div class="grid">

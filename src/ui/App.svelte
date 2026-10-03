@@ -77,7 +77,7 @@
       input?.openPalette();
     } else if (mod(e) && e.shiftKey && ['l', 'e', 'r'].includes(e.key.toLowerCase())) {
       e.preventDefault();
-      app.doc.layout.align = ({ l: 'left', e: 'centre', r: 'right' } as const)[
+      app.doc.layout.align = ({ l: 'left', e: 'center', r: 'right' } as const)[
         e.key.toLowerCase() as 'l' | 'e' | 'r'
       ];
     } else if (

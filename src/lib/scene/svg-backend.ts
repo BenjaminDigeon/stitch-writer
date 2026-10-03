@@ -67,13 +67,13 @@ function node(n: SceneNode, o: Required<SvgOptions>): string {
       return `<path${cls(n.className)} d="${pathData(n.ops, p)}" fill="${fill}"${rule}${n.stroke ? strokeAttrs(n.stroke, p) : ''}/>`;
     }
     case 'circles': {
-      if (!n.centres.length) return '';
+      if (!n.centers.length) return '';
       // One path of circles: two arcs per circle.
       let d = '';
       const r = num(n.r, p);
-      for (let i = 0; i < n.centres.length; i += 2) {
-        const x = n.centres[i]!;
-        const y = n.centres[i + 1]!;
+      for (let i = 0; i < n.centers.length; i += 2) {
+        const x = n.centers[i]!;
+        const y = n.centers[i + 1]!;
         d += `M${num(x - n.r, p)} ${num(y, p)}a${r} ${r} 0 1 0 ${num(2 * n.r, p)} 0a${r} ${r} 0 1 0 ${num(-2 * n.r, p)} 0z`;
       }
       return `<path${cls(n.className)} d="${d}" fill="${rgb(n.fill)}"/>`;
@@ -112,7 +112,7 @@ export function renderSvgFragment(nodes: readonly SceneNode[], options: SvgOptio
   return nodes.map((n) => node(n, o)).join('');
 }
 
-/** A complete SVG document. The size is in millimetres, so that it prints at the correct size. */
+/** A complete SVG document. The size is in millimeters, so that it prints at the correct size. */
 export function renderSvgDocument(
   page: ScenePage,
   options: SvgOptions & { unit?: 'mm' | 'px' } = {},

@@ -47,7 +47,7 @@ export interface TilePlan {
 
 export type PlanResult = TilePlan | { error: 'cell-too-large' };
 
-/** The size of the axis labels and the room around the chart for the labels and the centre arrows. */
+/** The size of the axis labels and the room around the chart for the labels and the center arrows. */
 export function gutters(cellMm: number): Gutters {
   const label = Math.min(3, Math.max(1.8, cellMm * 0.7));
   return { label, left: label * 0.6 * 3 + 2, top: label + 2.5, right: 4, bottom: 4 };

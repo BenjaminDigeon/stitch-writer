@@ -18,7 +18,7 @@ describe('TTF grid fonts (ACSF)', () => {
 
   it('shapes a word with joins, and each glyph keeps its source span', () => {
     const f = ACSF_FONTS.find((x) => x.id === 'acsf-brave')!;
-    const font = loadTtfFont(bytes(f.file), { id: f.id, name: f.name, licence: 'OFL-1.1' });
+    const font = loadTtfFont(bytes(f.file), { id: f.id, name: f.name, license: 'OFL-1.1' });
     const chart = layout('brave', font, { ...DEFAULT_LAYOUT, padding: 0 });
     expect(chart.issues.missing).toEqual([]);
     expect(chart.width).toBe(22);
@@ -27,7 +27,7 @@ describe('TTF grid fonts (ACSF)', () => {
 
   it('replaces a character that the font does not have', () => {
     const f = ACSF_FONTS[0]!;
-    const font = loadTtfFont(bytes(f.file), { id: f.id, name: f.name, licence: 'OFL-1.1' });
+    const font = loadTtfFont(bytes(f.file), { id: f.id, name: f.name, license: 'OFL-1.1' });
     const chart = layout('aŏb', font, { ...DEFAULT_LAYOUT, padding: 0 });
     expect(chart.issues.substituted[0]).toMatchObject({ from: 'ŏ', to: 'o' });
     expect(chart.issues.missing).toEqual([]);
@@ -35,7 +35,7 @@ describe('TTF grid fonts (ACSF)', () => {
 
   it('converts a TTF font into an editable font file', () => {
     const f = ACSF_FONTS[1]!;
-    const file = ttfToFontFile(bytes(f.file), { id: 'copy', name: 'Copy', licence: 'OFL-1.1' });
+    const file = ttfToFontFile(bytes(f.file), { id: 'copy', name: 'Copy', license: 'OFL-1.1' });
     expect(validateFont(file)).toEqual([]);
     expect(Object.keys(file.glyphs).length).toBeGreaterThan(100);
     expect(file.glyphs.a?.rows?.length).toBeGreaterThan(2);

@@ -43,7 +43,7 @@
     <fieldset class="row">
       <legend class="label">Alignment</legend>
       <div class="segmented">
-        {#each [['left', '⇤', 'Left'], ['centre', '↔', 'Centre'], ['right', '⇥', 'Right']] as const as [v, icon, name] (v)}
+        {#each [['left', '⇤', 'Left'], ['center', '↔', 'Center'], ['right', '⇥', 'Right']] as const as [v, icon, name] (v)}
           <label title="{name} (⌘⇧{name[0]})">
             <input
               type="radio"
@@ -157,7 +157,7 @@
     <fieldset class="row">
       <legend class="label">Show</legend>
       <div class="segmented">
-        {#each [['colour', 'Colour'], ['symbol', 'Symbols'], ['both', 'Both']] as const as [v, name] (v)}
+        {#each [['color', 'Color'], ['symbol', 'Symbols'], ['both', 'Both']] as const as [v, name] (v)}
           <label>
             <input
               type="radio"

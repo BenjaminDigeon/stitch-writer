@@ -132,7 +132,21 @@ export function validateFont(raw: unknown): ValidationIssue[] {
 }
 
 /** Parses and validates a font file. It throws an error with all issues if the file is not valid. */
-export function parseFontFile(raw: unknown): FontFile {
+/**
+ * Reads the older form of a font file. Older files have the field `source.licence` (British
+ * spelling): it becomes `source.license`.
+ */
+export function upgradeFontFile<T>(raw: T): T {
+  if (!raw || typeof raw !== 'object') return raw;
+  const source = (raw as { source?: unknown }).source;
+  if (!source || typeof source !== 'object') return raw;
+  const { licence, ...rest } = source as Record<string, unknown>;
+  if (typeof licence !== 'string' || 'license' in rest) return raw;
+  return { ...raw, source: { ...rest, license: licence } };
+}
+
+export function parseFontFile(input: unknown): FontFile {
+  const raw = upgradeFontFile(input);
   const issues = validateFont(raw);
   if (issues.length) {
     const list = issues

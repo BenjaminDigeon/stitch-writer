@@ -87,7 +87,7 @@ export interface FontSource {
   url?: string;
   extractedAt?: string;
   basedOn?: string;
-  licence: string;
+  license: string;
 }
 
 export interface FontFile {

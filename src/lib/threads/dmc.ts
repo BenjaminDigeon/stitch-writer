@@ -10,7 +10,7 @@ export interface Thread {
 }
 
 export const DMC_CREDIT: string = data.credit;
-export const DMC_LICENCE: string = data.licence;
+export const DMC_LICENSE: string = data.license;
 
 export const DMC_THREADS: readonly Thread[] = (data.threads as [string, string, string][]).map(
   ([id, name, hex]) => ({

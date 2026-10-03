@@ -2,13 +2,13 @@ import { decodeCell, type Chart } from '../layout/types.ts';
 import { symbolForThread } from './symbols.ts';
 import { BLACK, contrastOn, luminance, type PathOp, type Rgb, type SceneNode, type Stroke } from './types.ts';
 
-export type RenderMode = 'colour' | 'symbol' | 'both';
+export type RenderMode = 'color' | 'symbol' | 'both';
 
 export interface ChartStyle {
   /** The size of one cell in scene units. */
   cell: number;
   mode: RenderMode;
-  threadColour: (thread: number) => Rgb;
+  threadColor: (thread: number) => Rgb;
   minor: Stroke;
   major: Stroke;
   border: Stroke;
@@ -19,7 +19,7 @@ export interface ChartStyle {
   symbolWidth: number;
   /** Preview only: show the connector dots that are off, as faint marks. */
   inactiveDots?: Rgb;
-  centreLines?: Stroke;
+  centerLines?: Stroke;
 }
 
 /** A range of cells: x0 and y0 inclusive, x1 and y1 exclusive. */
@@ -30,12 +30,12 @@ export interface CellRegion {
   y1: number;
 }
 
-/** The chart style for print: line widths in millimetres. */
-export function printStyle(cell: number, mode: RenderMode, threadColour: (t: number) => Rgb): ChartStyle {
+/** The chart style for print: line widths in millimeters. */
+export function printStyle(cell: number, mode: RenderMode, threadColor: (t: number) => Rgb): ChartStyle {
   return {
     cell,
     mode,
-    threadColour,
+    threadColor,
     minor: { color: [150, 150, 150], width: 0.1 },
     major: { color: [40, 40, 40], width: 0.3 },
     border: { color: [0, 0, 0], width: 0.4 },
@@ -129,10 +129,10 @@ export function buildChartLayer(
     flush(r.x1);
   }
 
-  const showColour = style.mode !== 'symbol';
-  if (showColour) {
+  const showColor = style.mode !== 'symbol';
+  if (showColor) {
     for (const [t, ops] of runs) {
-      const color = style.threadColour(t);
+      const color = style.threadColor(t);
       // A very light thread gets an outline, so that it shows on white fabric.
       const stroke: Stroke | undefined =
         luminance(color) > 0.85
@@ -141,7 +141,7 @@ export function buildChartLayer(
       out.push({ t: 'path', ops, fill: color, stroke, className: `thread-${t}` });
     }
     for (const [t, ops] of halves)
-      out.push({ t: 'path', ops, fill: style.threadColour(t), className: `half-${t}` });
+      out.push({ t: 'path', ops, fill: style.threadColor(t), className: `half-${t}` });
   }
 
   // Grid: minor lines on each cell edge, major lines on each 10th edge (global, so that pages agree).
@@ -158,12 +158,12 @@ export function buildChartLayer(
   out.push({ t: 'rect', x: 0, y: 0, w: chart.width * s, h: chart.height * s, stroke: style.border });
 
   // Symbols.
-  if (style.mode !== 'colour') {
+  if (style.mode !== 'color') {
     for (const [t, cells] of fulls) {
       const shape = symbolForThread(t);
       const ops: PathOp[] = [];
       for (let i = 0; i < cells.length; i += 2) ops.push(...shape.ops(cells[i]! * s, cells[i + 1]! * s, s));
-      const color = style.mode === 'both' ? contrastOn(style.threadColour(t)) : BLACK;
+      const color = style.mode === 'both' ? contrastOn(style.threadColor(t)) : BLACK;
       out.push(
         shape.fill
           ? { t: 'path', ops, fill: color, className: `symbol-${t}` }
@@ -176,7 +176,7 @@ export function buildChartLayer(
       );
     }
     for (const h of halfCells) {
-      const color = style.mode === 'both' ? contrastOn(style.threadColour(h.thread)) : BLACK;
+      const color = style.mode === 'both' ? contrastOn(style.threadColor(h.thread)) : BLACK;
       const [x0, y0, x1, y1] = [h.x * s, h.y * s, (h.x + 1) * s, (h.y + 1) * s];
       const ops: PathOp[] =
         h.dir === '/'
@@ -192,9 +192,9 @@ export function buildChartLayer(
     }
   }
 
-  if (style.centreLines) {
-    const cx = chart.centre.x * s;
-    const cy = chart.centre.y * s;
+  if (style.centerLines) {
+    const cx = chart.center.x * s;
+    const cy = chart.center.y * s;
     out.push({
       t: 'path',
       ops: [
@@ -203,8 +203,8 @@ export function buildChartLayer(
         ['M', 0, cy],
         ['L', chart.width * s, cy],
       ],
-      stroke: style.centreLines,
-      className: 'centre',
+      stroke: style.centerLines,
+      className: 'center',
     });
   }
 
@@ -221,7 +221,7 @@ export function buildChartLayer(
       t: 'path',
       ops,
       stroke: {
-        color: style.threadColour(t),
+        color: style.threadColor(t),
         width: style.backWidth,
         cap: 'round',
         join: 'round',
@@ -236,13 +236,13 @@ export function buildChartLayer(
     list.push(k.x * s, k.y * s);
     knots.set(k.thread, list);
   }
-  for (const [t, centres] of knots)
-    out.push({ t: 'circles', r: 0.28 * s, centres, fill: style.threadColour(t), className: `knot-${t}` });
+  for (const [t, centers] of knots)
+    out.push({ t: 'circles', r: 0.28 * s, centers, fill: style.threadColor(t), className: `knot-${t}` });
   if (style.inactiveDots) {
-    const centres: number[] = [];
-    for (const d of chart.dots) if (!d.active) centres.push((d.x + 0.5) * s, (d.y + 0.5) * s);
-    if (centres.length)
-      out.push({ t: 'circles', r: 0.18 * s, centres, fill: style.inactiveDots, className: 'dot-off' });
+    const centers: number[] = [];
+    for (const d of chart.dots) if (!d.active) centers.push((d.x + 0.5) * s, (d.y + 0.5) * s);
+    if (centers.length)
+      out.push({ t: 'circles', r: 0.18 * s, centers, fill: style.inactiveDots, className: 'dot-off' });
   }
   return out;
 }
