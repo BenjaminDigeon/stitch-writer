@@ -13,6 +13,7 @@
   import ExportDialog from './ExportDialog.svelte';
   import ShortcutsDialog from './ShortcutsDialog.svelte';
   import Toasts, { toast } from './Toasts.svelte';
+  import GitHubLink from './GitHubLink.svelte';
   import { FONT_CHANNEL } from '../lib/font/custom-store.ts';
 
   const app = new AppState();
@@ -134,6 +135,7 @@
       aria-label="Keyboard shortcuts"
       title="Keyboard shortcuts (?)">?</button
     >
+    <GitHubLink />
     <button class="btn" onclick={share} disabled={!app.doc.text.trim()}
       >Share<span class="wide">link</span></button
     >

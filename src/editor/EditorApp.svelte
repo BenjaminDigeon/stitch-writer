@@ -11,6 +11,7 @@
   import { DEFAULT_LAYOUT } from '../lib/layout/types.ts';
   import { download } from '../lib/export/download.ts';
   import type { Rgb } from '../lib/scene/types.ts';
+  import GitHubLink from '../ui/GitHubLink.svelte';
 
   const ed = new EditorState();
   onMount(() => {
@@ -188,6 +189,7 @@
     <button class="btn" onclick={() => ed.redo()} disabled={!ed.canRedo} title="Redo (⌘⇧Z)">↷</button>
     <button class="btn" onclick={exportFont} disabled={!ed.file}>Export .font.json</button>
     <button class="btn ghost" onclick={confirmDelete} disabled={!ed.fontId}>Delete</button>
+    <GitHubLink />
   </header>
 
   {#if ed.message}

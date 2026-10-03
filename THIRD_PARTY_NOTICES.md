@@ -27,6 +27,14 @@
   credit on the PDF cover page.
 - DMC is a trademark of its owner. This project is not affiliated with DMC. The colours are approximations.
 
+## Icons
+
+### Octicons
+
+- Icon: "mark-github" in `src/ui/GitHubLink.svelte`. The link to the source code uses it.
+- Copyright GitHub Inc., https://github.com/primer/octicons
+- Licence: MIT
+
 ## Libraries
 
 These libraries are in the build: Svelte (MIT), pdf-lib (MIT), @pdf-lib/fontkit (MIT) and

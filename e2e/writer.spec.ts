@@ -8,6 +8,13 @@ test.beforeEach(async ({ page }) => {
   await page.goto('./');
 });
 
+test('the top bar links to the source code', async ({ page }) => {
+  const link = page.getByRole('link', { name: 'Source code on GitHub' });
+  await expect(link).toBeInViewport();
+  await expect(link).toHaveAttribute('href', 'https://github.com/BenjaminDigeon/stitch-writer');
+  await expect(link).toHaveAttribute('target', '_blank');
+});
+
 test('typing updates the chart and the stitch count', async ({ page }) => {
   await expect(page.getByText('Start typing to make your chart')).toBeVisible();
   await page.locator('#stitch-text').fill('Hello');
