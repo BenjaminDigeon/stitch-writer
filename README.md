@@ -19,8 +19,9 @@ Use it online: **https://benjamindigeon.github.io/stitch-writer/**
   - a large chart is cut into pages, with overlap rows and columns;
   - grid numbers that continue across the pages;
   - a cover page with the sizes, a 50 mm calibration ruler, the thread legend and a page map.
-- DMC threads: one main color and one accent color. The chart shows color, symbols (black and
-  white printing), or both.
+- Colors: up to 16 DMC colors for the text. The text has one color, or a new color for each
+  letter, each word or each line. The motifs have their own fill color. The chart shows color,
+  symbols (20 shapes, for black-and-white printing), or both. The legend has one row for each color.
 - A fabric calculator: Aida 11–18, evenweave or linen over two, the finished size and the size of
   the fabric to cut.
 - A share link: the URL keeps the text and all the settings. The app also saves your work in the browser.

@@ -20,7 +20,10 @@
       return {
         name,
         label: glyph?.label ?? name,
-        chart: layout(`:${name}:`, font, { ...DEFAULT_LAYOUT, padding: 0 }, {}, app.motifs),
+        chart: layout(`:${name}:`, font, { ...DEFAULT_LAYOUT, padding: 0 }, {}, app.motifs, {
+          ...app.colors,
+          ranges: [],
+        }),
       };
     });
   });

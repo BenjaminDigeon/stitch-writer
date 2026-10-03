@@ -1,5 +1,6 @@
 import { spaceKey } from '../font/schema.ts';
 import type { Font, Glyph } from '../font/font.ts';
+import { DEFAULT_COLORS, tokenColors, type ColorSettings } from './color.ts';
 import { resolveConnectors, type PlacedGlyph } from './connectors.ts';
 import { tokenize } from './tokenize.ts';
 import {
@@ -121,8 +122,9 @@ function splitLines(
 const NO_MOTIFS: ReadonlyMap<string, Glyph> = new Map();
 
 /**
- * Turns the text into a chart: glyph placement, alignment, connector dots and stitch counts.
+ * Turns the text into a chart: glyph placement, alignment, colors, connector dots and stitch counts.
  * `motifs` is a shared motif library for the motif names that the font does not have.
+ * `colors` gives the chart thread of each stitch. The default keeps the font threads.
  */
 export function layout(
   text: string,
@@ -130,6 +132,7 @@ export function layout(
   s: LayoutSettings,
   overrides: DotOverrides = {},
   motifs: ReadonlyMap<string, Glyph> = NO_MOTIFS,
+  colors: ColorSettings = DEFAULT_COLORS,
 ): Chart {
   const tokens = tokenize(text, font, s, motifs.keys());
   const issues: Chart['issues'] = { missing: [], substituted: [] };
@@ -149,6 +152,14 @@ export function layout(
 
   const ls = s.letterSpacing ?? font.metrics.letterSpacing;
   const lines = splitLines(tokens, font, s, motifs);
+
+  // The chart thread of a stitch: font thread 0 takes the color of its letter, and the other font
+  // threads take the motif fill.
+  const tokenColor = tokenColors(tokens, colors.mode, colors.ranges, colors.textThreads.length);
+  const threadOf = (token: number, fontThread: number): number =>
+    fontThread === 0
+      ? (colors.textThreads[tokenColor[token] ?? 0] ?? colors.textThreads[0] ?? 0)
+      : colors.accentThread;
 
   // Pass 1: horizontal placement and the vertical extent of each line. The advance is fixed, except
   // inside a shaped word, where the font gives the positions (joins and kerning).
@@ -209,6 +220,7 @@ export function layout(
           baseline: p.baseline,
           srcStart: it.src.start,
           joinsPrevious: joins,
+          threadOf: (t) => threadOf(it.token, t),
         });
         joins = true;
       } else {
@@ -261,22 +273,17 @@ export function layout(
         if (c.optional && !activeDots.has(`${it.src.start}:${c.x}:${c.y}`)) continue;
         const cx = gx + c.x;
         const cy = base + c.y;
-        raw.push({
-          x: cx,
-          y: cy,
-          code: cellCode({ thread: c.thread, half: c.half }),
-          thread: c.thread,
-          half: !!c.half,
-        });
+        const thread = threadOf(it.token, c.thread);
+        raw.push({ x: cx, y: cy, code: cellCode({ thread, half: c.half }), thread, half: !!c.half });
         grow(cx, cy, cx + 1, cy + 1);
       }
       for (const l of g.lines) {
         const pts = l.pts.map((v, i) => (i % 2 === 0 ? v + gx : v + base));
         for (let i = 0; i < pts.length; i += 2) grow(pts[i]!, pts[i + 1]!, pts[i]!, pts[i + 1]!);
-        lineList.push({ pts, thread: l.thread });
+        lineList.push({ pts, thread: threadOf(it.token, l.thread) });
       }
       for (const k of g.knots) {
-        knotList.push({ x: k.x + gx, y: k.y + base, thread: k.thread });
+        knotList.push({ x: k.x + gx, y: k.y + base, thread: threadOf(it.token, k.thread) });
         grow(k.x + gx, k.y + base, k.x + gx, k.y + base);
       }
     }

@@ -2,7 +2,7 @@
   import { onMount, setContext } from 'svelte';
   import { AppState } from '../lib/state/app.svelte.ts';
   import { readStartupDoc, shareUrl, startPersistence } from '../lib/state/persist.svelte.ts';
-  import { DEFAULTS_V1, type Doc } from '../lib/state/doc.ts';
+  import { DEFAULTS_V2, type Doc } from '../lib/state/doc.ts';
   import type { Span } from '../lib/layout/types.ts';
   import PreviewBanner from './PreviewBanner.svelte';
   import TextInput from './TextInput.svelte';
@@ -18,7 +18,7 @@
 
   const app = new AppState();
   setContext('app', app);
-  const newDocFontId = DEFAULTS_V1.fontId;
+  const newDocFontId = DEFAULTS_V2.fontId;
 
   let ready = $state(false);
   let input: TextInput | undefined = $state();

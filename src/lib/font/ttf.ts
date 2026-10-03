@@ -107,6 +107,9 @@ function bbox(poly: readonly Point[]) {
   return { minX, minY, maxX, maxY, w: maxX - minX, h: maxY - minY };
 }
 
+/** The most shaped words that a TTF font keeps in its cache. */
+const SHAPE_CACHE_SIZE = 2000;
+
 const median = (v: number[]) => [...v].sort((a, b) => a - b)[Math.floor(v.length / 2)] ?? 0;
 
 function bestResidue(values: number[], pitch: number): { residue: number; score: number } {
@@ -248,41 +251,43 @@ export function loadTtfFont(bytes: Uint8Array, info: TtfFontInfo): Font {
   }
   const xHeight = -(span('x')?.min ?? -Math.round(ascent / 2));
 
+  // The shaped words. A key press changes one word, so the other words come from the cache.
+  const shapeCache = new Map<string, ShapedGlyph[]>();
   const shaper: Shaper = {
     supports: (ch) => [...ch].every((c) => fk.hasGlyphForCodePoint(c.codePointAt(0)!)),
     shape(text) {
+      const cached = shapeCache.get(text);
+      if (cached) return cached;
       const run = fk.layout(text);
-      const out: ShapedGlyph[] = [];
-      // Map each glyph back to the code point that it comes from. Contextual glyphs that fontkit inserts
-      // (joins) carry the code point of their letter.
+      // Map each glyph back to the code point that it comes from. The glyph codes of contextual forms
+      // and joins do not tell it, so each prefix of the text is shaped: the glyphs that a code point
+      // adds belong to it. Thus a join that comes before a letter belongs to that letter.
       const cps = [...text];
-      const offsets: number[] = [];
-      let o = 0;
-      for (const c of cps) {
-        offsets.push(o);
-        o += c.length;
-      }
-      let cursor = 0;
-      let last = 0;
+      const owner: number[] = [];
+      let offset = 0;
+      cps.forEach((c, k) => {
+        const count =
+          k === cps.length - 1 ? run.glyphs.length : fk.layout(cps.slice(0, k + 1).join('')).glyphs.length;
+        while (owner.length < Math.min(count, run.glyphs.length)) owner.push(offset);
+        offset += c.length;
+      });
+      const lastOffset = offset - (cps[cps.length - 1]?.length ?? 0);
+      const out: ShapedGlyph[] = [];
       let pen = 0;
       run.glyphs.forEach((g, i) => {
         const pos = run.positions[i]!;
-        const first = g.codePoints[0];
-        if (first !== undefined && cursor < cps.length && cps[cursor]!.codePointAt(0) === first) {
-          last = cursor;
-          cursor += Math.max(1, g.codePoints.length);
-        }
-        const glyph = cells(g);
         out.push({
-          key: glyph.key,
+          key: cells(g).key,
           x: Math.round((pen + pos.xOffset) / grid.pitch),
           dy: -Math.round(pos.yOffset / grid.pitch),
           advance: Math.round(pos.xAdvance / grid.pitch),
-          srcIndex: offsets[last] ?? 0,
+          srcIndex: owner[i] ?? lastOffset,
           missing: g.id === 0,
         });
         pen += pos.xAdvance;
       });
+      if (shapeCache.size >= SHAPE_CACHE_SIZE) shapeCache.clear();
+      shapeCache.set(text, out);
       return out;
     },
   };

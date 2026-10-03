@@ -67,6 +67,8 @@
       { ...DEFAULT_LAYOUT, padding: 0, align: 'left', lineSpacing: 0 },
       {},
       app.motifs,
+      // The sample is not at the offsets of the text, so the colors set by hand do not apply.
+      { ...app.colors, ranges: [] },
     );
   }
 

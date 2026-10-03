@@ -1,7 +1,12 @@
 <script lang="ts">
   import { searchThreads, threadById, type Thread } from '../lib/threads/dmc.ts';
 
-  let { value, label, onchange }: { value: string; label: string; onchange: (id: string) => void } = $props();
+  let {
+    value,
+    label,
+    onchange,
+    hideLabel = false,
+  }: { value: string; label: string; onchange: (id: string) => void; hideLabel?: boolean } = $props();
 
   const id = `dmc-${Math.random().toString(36).slice(2, 8)}`;
   let query = $state('');
@@ -45,7 +50,7 @@
 </script>
 
 <div class="combo">
-  <label for={id} class="label">{label}</label>
+  <label for={id} class={hideLabel ? 'visually-hidden' : 'label'}>{label}</label>
   <div class="control">
     <span class="swatch" style:background={current?.hex ?? '#ccc'}></span>
     <input
@@ -58,6 +63,7 @@
       aria-activedescendant={open ? `${id}-opt-${active}` : undefined}
       autocomplete="off"
       placeholder={current ? `${current.id} · ${current.name}` : 'DMC number or name'}
+      title={current ? `DMC ${current.id} · ${current.name}` : undefined}
       value={query}
       oninput={(e) => {
         query = e.currentTarget.value;

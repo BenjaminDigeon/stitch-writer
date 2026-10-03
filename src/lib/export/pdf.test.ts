@@ -4,9 +4,10 @@ import { describe, expect, it } from 'vitest';
 import { fabricSize, DEFAULT_FABRIC } from '../fabric/fabric.ts';
 import { makeFont } from '../font/test-fonts.ts';
 import { layout } from '../layout/layout.ts';
-import { DEFAULT_LAYOUT } from '../layout/types.ts';
+import { DEFAULT_LAYOUT, type Chart } from '../layout/types.ts';
 import { pdfTextMeasure, renderPdf } from '../scene/pdf-backend.ts';
-import { DMC_THREADS } from '../threads/dmc.ts';
+import { DMC_THREADS, type Thread } from '../threads/dmc.ts';
+import { legendRows } from './legend.ts';
 import { chartToOxs } from './oxs.ts';
 import { buildPdfDocument } from './pdf-document.ts';
 import { planTiles, type TilePlan } from './tiling.ts';
@@ -23,10 +24,21 @@ const font = makeFont({
   b: ['X..', 'XXX', 'X.X', 'XXX'],
   'heart-01': { rows: ['O.O', 'OOO', '.O.'], type: 'motif' },
 });
-const threads = [DMC_THREADS.find((t) => t.id === '310')!, DMC_THREADS.find((t) => t.id === '321')!];
+const dmc = (ids: string[]) => ids.map((id) => DMC_THREADS.find((t) => t.id === id)!);
+const threads = dmc(['310', '321']);
+const tenThreads = dmc(['310', '321', '3750', '3765', '3346', '783', '815', '333', '900', '434']);
 
-async function makePdf(text: string, cellMm: number, cover = true) {
-  const chart = layout(text, font, DEFAULT_LAYOUT);
+/** "ab ab ab ab ab" with one color for each letter, on the threads 0 to count - 1. */
+const colorful = (count: number) =>
+  layout('ab ab ab ab ab', font, DEFAULT_LAYOUT, {}, undefined, {
+    mode: 'letter',
+    ranges: [],
+    textThreads: Array.from({ length: count }, (_, i) => i),
+    accentThread: count,
+  });
+
+async function makePdf(text: string | Chart, cellMm: number, cover = true, list: Thread[] = threads) {
+  const chart = typeof text === 'string' ? layout(text, font, DEFAULT_LAYOUT) : text;
   const plan = planTiles(
     chart,
     { paper: 'a4', orientation: 'portrait', cellMm, overlap: 2, marginMm: 10, snapTo10: false },
@@ -37,8 +49,8 @@ async function makePdf(text: string, cellMm: number, cover = true) {
       chart,
       title: 'Test chart — Čeština ŏ',
       fontName: 'Test',
-      threads,
-      threadColor: (t) => threads[t]!.rgb,
+      threads: list,
+      threadColor: (t) => list[t]!.rgb,
       mode: 'both',
       fabric: DEFAULT_FABRIC,
       fabricSize: fabricSize(chart.design, DEFAULT_FABRIC),
@@ -86,6 +98,28 @@ describe('PDF export', () => {
   it('cuts a long text into several pages', async () => {
     const { plan, bytes } = await makePdf('ab '.repeat(40) + '\n' + 'ba '.repeat(40), 5);
     expect(plan.tiles.length).toBeGreaterThan(1);
+    expect((await PDFDocument.load(bytes)).getPageCount()).toBe(plan.tiles.length + 1);
+  });
+
+  it('gives each color a legend row and an OXS palette entry', () => {
+    const chart = colorful(5);
+    expect(legendRows(chart, tenThreads, DEFAULT_FABRIC).map((r) => r.dmc.id)).toEqual([
+      '310',
+      '321',
+      '3750',
+      '3765',
+      '3346',
+    ]);
+    const xml = chartToOxs(chart, tenThreads, 'Colors');
+    expect(xml).toContain('palettecount="5"');
+    expect((xml.match(/<palette_item /g) ?? []).length).toBe(6);
+    expect(xml).toContain('number="DMC    3346"');
+  });
+
+  it('makes a PDF with a legend of 10 colors in two columns', async () => {
+    const chart = colorful(10);
+    expect(legendRows(chart, tenThreads, DEFAULT_FABRIC)).toHaveLength(10);
+    const { plan, bytes } = await makePdf(chart, 3, true, tenThreads);
     expect((await PDFDocument.load(bytes)).getPageCount()).toBe(plan.tiles.length + 1);
   });
 

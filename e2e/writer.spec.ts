@@ -38,7 +38,7 @@ test('the text and the settings survive a reload, and the share link opens the s
   await page.getByRole('radio', { name: 'Left' }).check({ force: true });
   await page.waitForTimeout(800);
   const url = page.url();
-  expect(url).toMatch(/#1\./);
+  expect(url).toMatch(/#2\./);
   await page.reload();
   await expect(page.locator('#stitch-text')).toHaveValue('Home sweet home');
   const other = await browser.newContext();
@@ -47,6 +47,33 @@ test('the text and the settings survive a reload, and the share link opens the s
   await expect(p2.locator('#stitch-text')).toHaveValue('Home sweet home');
   await expect(p2.getByRole('radio', { name: 'Left' })).toBeChecked();
   await other.close();
+});
+
+test('each letter or each word can have its own color', async ({ page }) => {
+  const threadPaths = page.locator('svg.chart path[class^="thread-"]');
+  const rows = page.getByRole('list', { name: 'Text colors' }).getByRole('listitem');
+  await page.locator('#stitch-text').fill('Emma');
+  await expect(threadPaths).toHaveCount(1);
+
+  await page.getByRole('button', { name: '+ Add a color' }).click();
+  await expect(page.getByRole('radio', { name: 'Each letter' })).toBeChecked();
+  await page.getByRole('button', { name: '+ Add a color' }).click();
+  await expect(rows).toHaveCount(3);
+  // E, m, m, a with 3 colors: the colors 1, 2, 3, then 1 again.
+  await expect(threadPaths).toHaveCount(3);
+  for (const row of await rows.all()) await expect(row.locator('.count')).not.toHaveText('0');
+
+  await page.getByRole('radio', { name: 'Each word' }).check({ force: true });
+  await expect(threadPaths).toHaveCount(1);
+  await expect(rows.nth(1).locator('.count')).toHaveText('0');
+
+  await page.getByRole('button', { name: 'Remove color 3' }).click();
+  await expect(rows).toHaveCount(2);
+
+  await page.waitForTimeout(800);
+  await page.reload();
+  await expect(rows).toHaveCount(2);
+  await expect(page.getByRole('radio', { name: 'Each word' })).toBeChecked();
 });
 
 test('the PDF export is a vector PDF with a cover and the chart pages', async ({ page }, info) => {

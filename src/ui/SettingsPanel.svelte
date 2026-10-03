@@ -2,14 +2,11 @@
   import { getContext } from 'svelte';
   import type { AppState } from '../lib/state/app.svelte.ts';
   import { FABRIC_PRESETS, formatSize } from '../lib/fabric/fabric.ts';
-  import DmcCombobox from './DmcCombobox.svelte';
+  import ColorsPanel from './ColorsPanel.svelte';
 
   const app = getContext<AppState>('app');
   const L = $derived(app.doc.layout);
 
-  const hasAccent = $derived(
-    app.chart.stats.threads[1] !== undefined || /:[a-z][a-z0-9-]*:/.test(app.doc.text),
-  );
   const hasDots = $derived(app.chart.dots.length > 0);
   const letterDefault = $derived(app.font?.metrics.letterSpacing ?? 1);
 
@@ -143,36 +140,7 @@
   </div>
 </details>
 
-<details class="section" open>
-  <summary>Threads</summary>
-  <div class="rows">
-    <DmcCombobox label="Text" value={app.doc.threads[0] ?? ''} onchange={(id) => (app.doc.threads[0] = id)} />
-    {#if hasAccent}
-      <DmcCombobox
-        label="Accent (motifs)"
-        value={app.doc.threads[1] ?? ''}
-        onchange={(id) => (app.doc.threads[1] = id)}
-      />
-    {/if}
-    <fieldset class="row">
-      <legend class="label">Show</legend>
-      <div class="segmented">
-        {#each [['color', 'Color'], ['symbol', 'Symbols'], ['both', 'Both']] as const as [v, name] (v)}
-          <label>
-            <input
-              type="radio"
-              name="display"
-              value={v}
-              checked={app.doc.display === v}
-              onchange={() => (app.doc.display = v)}
-            />
-            <span>{name}</span>
-          </label>
-        {/each}
-      </div>
-    </fieldset>
-  </div>
-</details>
+<ColorsPanel />
 
 <details class="section">
   <summary>Fabric</summary>

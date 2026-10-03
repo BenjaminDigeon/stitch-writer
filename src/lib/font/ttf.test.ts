@@ -25,6 +25,25 @@ describe('TTF grid fonts (ACSF)', () => {
     expect(chart.placements.map((p) => p.src.start)).toEqual([0, 1, 2, 3, 4]);
   });
 
+  it('gives each join the source span of the letter after it', () => {
+    const f = ACSF_FONTS.find((x) => x.id === 'acsf-brave')!;
+    const font = loadTtfFont(bytes(f.file), { id: f.id, name: f.name, license: 'OFL-1.1' });
+    const starts = (text: string) =>
+      layout(text, font, { ...DEFAULT_LAYOUT, padding: 0 }).placements.map((p) => p.src.start);
+    // "E", join + "m", join + "m", "a": the joins come before their letter.
+    expect(starts('Emma')).toEqual([0, 1, 1, 2, 2, 3]);
+    expect(starts('anna')).toEqual([0, 1, 1, 2, 2, 3]);
+  });
+
+  it.each(ACSF_FONTS.map((f) => [f.name, f]))('maps each glyph of %s to its letter', (_name, f) => {
+    const font = loadTtfFont(bytes(f.file), { id: f.id, name: f.name, license: 'OFL-1.1' });
+    const text = 'Happy birthday Emma, the quick brown fox jumps over lazy dogs';
+    const starts = layout(text, font, { ...DEFAULT_LAYOUT, padding: 0 }).placements.map((p) => p.src.start);
+    const letters = [...text].flatMap((c, i) => (c === ' ' ? [] : [i]));
+    expect([...new Set(starts)]).toEqual(letters);
+    expect(starts).toEqual([...starts].sort((a, b) => a - b));
+  });
+
   it('replaces a character that the font does not have', () => {
     const f = ACSF_FONTS[0]!;
     const font = loadTtfFont(bytes(f.file), { id: f.id, name: f.name, license: 'OFL-1.1' });
