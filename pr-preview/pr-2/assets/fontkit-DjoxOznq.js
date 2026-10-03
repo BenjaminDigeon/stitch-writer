@@ -1,1 +1,0 @@
-import{n as e}from"./fontkit.es-BOj63YZx.js";var t=e,n=t.default??t;function r(e){return n.create(e)}export{r as openFont};
