@@ -1,4 +1,5 @@
 dist
+dist-preview
 node_modules
 package-lock.json
 src/data/dmc.json

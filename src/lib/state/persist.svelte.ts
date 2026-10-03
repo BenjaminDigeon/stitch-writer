@@ -1,8 +1,9 @@
 import { decodeDoc, encodeDoc } from './codec.ts';
 import { newDoc, sanitizeDoc, type Doc } from './doc.ts';
 import type { AppState } from './app.svelte.ts';
+import { storageName } from '../preview.ts';
 
-export const AUTOSAVE_KEY = 'stitch-writer:autosave';
+export const AUTOSAVE_KEY = storageName('stitch-writer:autosave');
 
 function readAutosave(): Doc | null {
   try {

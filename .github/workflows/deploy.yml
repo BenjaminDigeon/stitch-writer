@@ -4,20 +4,28 @@ on:
   push:
     branches: [main]
   pull_request:
+    types: [opened, reopened, synchronize, closed]
   workflow_dispatch:
 
 permissions:
   contents: read
 
-# One run at a time for each branch. A new push cancels a running pull request check,
+# One run at a time for each branch. A new push cancels a running pull request run,
 # but never a deployment of main.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
+# GitHub Pages serves the "gh-pages" branch:
+# - the root holds the main site;
+# - "pr-preview/pr-<number>/" holds the preview of an open pull request.
+# Only the "verify" job runs the project code. The jobs that push to "gh-pages" use the
+# files that "verify" built.
+
 jobs:
   verify:
     name: Verify and build
+    if: github.event.action != 'closed'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -50,9 +58,25 @@ jobs:
 
       - name: Upload the site
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-        uses: actions/upload-pages-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
+          name: site
           path: dist
+          retention-days: 1
+
+      - name: Build the preview
+        if: github.event_name == 'pull_request'
+        env:
+          VITE_PULL_REQUEST_URL: ${{ github.event.pull_request.html_url }}
+        run: npm run build -- --outDir dist-preview
+
+      - name: Upload the preview
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v7
+        with:
+          name: preview
+          path: dist-preview
+          retention-days: 1
 
   deploy:
     name: Deploy to GitHub Pages
@@ -60,11 +84,65 @@ jobs:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      contents: write
     steps:
-      - id: deployment
-        uses: actions/deploy-pages@v5
+      - uses: actions/checkout@v7
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: site
+          path: site
+
+      # Jekyll drops the files whose name starts with "_". This file stops Jekyll.
+      - run: touch site/.nojekyll
+
+      - uses: JamesIves/github-pages-deploy-action@fa24774553152dd7873cd16ebd8d959b010c5445 # v4.9.0
+        with:
+          folder: site
+          branch: gh-pages
+          clean-exclude: pr-preview
+          force: false
+          commit-message: Deploy the main site at ${{ github.sha }}
+
+  preview:
+    name: Deploy the preview
+    needs: verify
+    # A pull request from a fork gets a read-only token, so it cannot push to "gh-pages".
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: preview
+          path: preview
+
+      - uses: rossjrw/pr-preview-action@ffa7509e91a3ec8dfc2e5536c4d5c1acdf7a6de9 # v1.8.1
+        with:
+          action: deploy
+          source-dir: preview
+          wait-for-pages-deployment: true
+          qr-code: false
+          deploy-commit-message: Deploy the preview of PR ${{ github.event.number }}
+
+  remove-preview:
+    name: Remove the preview
+    if: github.event.action == 'closed' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
+      - uses: rossjrw/pr-preview-action@ffa7509e91a3ec8dfc2e5536c4d5c1acdf7a6de9 # v1.8.1
+        with:
+          action: remove
+          remove-commit-message: Remove the preview of PR ${{ github.event.number }}

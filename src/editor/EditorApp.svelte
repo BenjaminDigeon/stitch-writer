@@ -7,6 +7,7 @@
   import { CHARACTER_GROUPS } from '../lib/font/charset.ts';
   import { clearGlyph, resizeGlyph, shiftGlyph } from '../lib/font/edit.ts';
   import { layout } from '../lib/layout/layout.ts';
+  import PreviewBanner from '../ui/PreviewBanner.svelte';
   import { DEFAULT_LAYOUT } from '../lib/layout/types.ts';
   import { download } from '../lib/export/download.ts';
   import type { Rgb } from '../lib/scene/types.ts';
@@ -149,6 +150,7 @@
 <svelte:window {onkeydown} />
 
 <div class="shell">
+  <PreviewBanner />
   <header class="topbar">
     <a class="back" href="./index.html" title="Back to the writer">← Stitch Writer</a>
     <h1>Font editor</h1>

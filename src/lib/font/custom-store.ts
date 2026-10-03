@@ -3,15 +3,17 @@ import { loadFont } from './font.ts';
 import type { FontEntry } from './registry.ts';
 import type { FontFile } from './schema.ts';
 import { parseFontFile } from './validate.ts';
+import { storageName } from '../preview.ts';
 
 /** A font that the user made or imported. It is kept in IndexedDB, in this browser only. */
 export type CustomFontRecord =
   | { type: 'json'; id: string; name: string; file: FontFile; updatedAt: number }
   | { type: 'ttf'; id: string; name: string; bytes: Uint8Array; licence: string; updatedAt: number };
 
-const store = typeof indexedDB === 'undefined' ? undefined : createStore('stitch-writer', 'fonts');
+const store =
+  typeof indexedDB === 'undefined' ? undefined : createStore(storageName('stitch-writer'), 'fonts');
 
-export const FONT_CHANNEL = 'stitch-writer-fonts';
+export const FONT_CHANNEL = storageName('stitch-writer-fonts');
 
 export async function listCustomFonts(): Promise<CustomFontRecord[]> {
   if (!store) return [];

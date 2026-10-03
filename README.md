@@ -49,8 +49,26 @@ Relative paths are used, so a sub-folder also works.
 ## Deployment
 
 The GitHub Actions workflow `.github/workflows/deploy.yml` runs the same checks as
-`npm run verify` on each pull request and on each push to `main`. After a push to `main`, it
-deploys `dist/` to GitHub Pages. The Pages source of the repository must be "GitHub Actions".
+`npm run verify` on each pull request and on each push to `main`. GitHub Pages serves the
+`gh-pages` branch, which the workflow writes:
+
+- After a push to `main`, the workflow puts the site at the root of `gh-pages`.
+- For each pull request, the workflow puts a preview at `pr-preview/pr-<number>/`, for example
+  https://benjamindigeon.github.io/stitch-writer/pr-preview/pr-4/. A comment on the pull request
+  gives the link. When the pull request closes, the workflow removes the preview.
+- A pull request from a fork gets no preview, because its token cannot write to the repository.
+
+A preview shows a banner. It keeps its autosave and its fonts apart from the main site, because
+all the previews have the same browser origin as the main site.
+
+To build a preview on your computer, set the URL of the pull request:
+
+```sh
+VITE_PULL_REQUEST_URL=https://github.com/BenjaminDigeon/stitch-writer/pull/4 npm run build -- --outDir dist-preview
+```
+
+Repository settings: in "Settings › Pages", the source must be "Deploy from a branch", with the
+branch `gh-pages` and the folder `/ (root)`.
 
 ## How it works
 
