@@ -4,6 +4,8 @@ Stitch Writer makes a cross-stitch chart from a text. You type the text, and the
 each key. You can export the chart as a vector PDF to print, as SVG, as PNG, or as OXS (Open Cross
 Stitch) for other cross-stitch programs.
 
+Use it online: **https://benjamindigeon.github.io/stitch-writer/**
+
 ## Features
 
 - Real keyboard input, with undo, paste and selection. A missing character has a red underline.
@@ -43,6 +45,12 @@ npm run build        # static site in dist/
 
 The build output (`dist/`) is a static site. You can host it on any static web server.
 Relative paths are used, so a sub-folder also works.
+
+## Deployment
+
+The GitHub Actions workflow `.github/workflows/deploy.yml` runs the same checks as
+`npm run verify` on each pull request and on each push to `main`. After a push to `main`, it
+deploys `dist/` to GitHub Pages. The Pages source of the repository must be "GitHub Actions".
 
 ## How it works
 
