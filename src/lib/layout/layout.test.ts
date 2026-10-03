@@ -85,7 +85,7 @@ describe('layout', () => {
   });
 
   it('aligns lines and counts stitches', () => {
-    const c = layout('a\naba', font, settings({ align: 'centre', lineSpacing: 0 }));
+    const c = layout('a\naba', font, settings({ align: 'center', lineSpacing: 0 }));
     expect(c.width).toBe(8);
     expect(c.stats.threads[0]!.full).toBe(4 + 4 + 5 + 4);
     const rows = ascii(c);
@@ -106,10 +106,10 @@ describe('layout', () => {
     expect(c.issues.substituted).toEqual([{ from: 'ê', to: 'e', src: { start: 2, end: 3 } }]);
   });
 
-  it('adds padding around the design and centres it', () => {
+  it('adds padding around the design and centers it', () => {
     const c = layout('a', font, settings({ padding: 3 }));
     expect([c.width, c.height]).toEqual([8, 8]);
     expect(c.design).toEqual({ x0: 3, y0: 3, x1: 5, y1: 5 });
-    expect(c.centre).toEqual({ x: 4, y: 4 });
+    expect(c.center).toEqual({ x: 4, y: 4 });
   });
 });

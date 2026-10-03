@@ -23,7 +23,7 @@
   const style = $derived<ChartStyle>({
     cell: 1,
     mode: app.doc.display,
-    threadColour: app.threadColour,
+    threadColor: app.threadColor,
     minor: { color: [205, 205, 205], width: 1, nonScaling: true },
     major: { color: [120, 120, 120], width: 1.5, nonScaling: true },
     border: { color: [60, 60, 60], width: 2, nonScaling: true },
@@ -252,13 +252,13 @@
             />
           {/each}
         </g>
-        <!-- Centre arrows, at the edges of the chart. -->
-        <g class="centre-marks">
+        <!-- Center arrows, at the edges of the chart. -->
+        <g class="center-marks">
           {#each [vp.ty - 2, vp.ty + chart.height * vp.scale + 2] as y, i (i)}
-            <path d="M{vp.tx + chart.centre.x * vp.scale - 6} {y + (i ? 9 : -9)}h12l-6 {i ? -8 : 8}z" />
+            <path d="M{vp.tx + chart.center.x * vp.scale - 6} {y + (i ? 9 : -9)}h12l-6 {i ? -8 : 8}z" />
           {/each}
           {#each [vp.tx - 2, vp.tx + chart.width * vp.scale + 2] as x, i (i)}
-            <path d="M{x + (i ? 9 : -9)} {vp.ty + chart.centre.y * vp.scale - 6}v12l{i ? -8 : 8} -6z" />
+            <path d="M{x + (i ? 9 : -9)} {vp.ty + chart.center.y * vp.scale - 6}v12l{i ? -8 : 8} -6z" />
           {/each}
         </g>
       </svg>
@@ -352,7 +352,7 @@
     stroke-dasharray: 3 3;
   }
 
-  .centre-marks path {
+  .center-marks path {
     fill: var(--accent);
   }
 

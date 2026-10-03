@@ -12,14 +12,14 @@ Use it online: **https://benjamindigeon.github.io/stitch-writer/**
   A replaced character (for example "ŏ" stitched as "o") has a dotted underline.
 - 9 cursive fonts (ACSF) with joined letters, and 2 sample fonts.
 - Motifs (hearts and other shapes). Type `:heart` or use the Insert palette (⌘K / Ctrl+K).
-- A live preview: zoom with Ctrl+wheel or a pinch, move with the wheel or a drag, rulers, and centre arrows.
+- A live preview: zoom with Ctrl+wheel or a pinch, move with the wheel or a drag, rulers, and center arrows.
 - A vector PDF:
   - A4 or Letter, portrait, landscape or automatic;
   - the cell size in mm, or "Fit on one page";
   - a large chart is cut into pages, with overlap rows and columns;
   - grid numbers that continue across the pages;
   - a cover page with the sizes, a 50 mm calibration ruler, the thread legend and a page map.
-- DMC threads: one main colour and one accent colour. The chart shows colour, symbols (black and
+- DMC threads: one main color and one accent color. The chart shows color, symbols (black and
   white printing), or both.
 - A fabric calculator: Aida 11–18, evenweave or linen over two, the finished size and the size of
   the fabric to cut.
@@ -82,7 +82,7 @@ branch `gh-pages` and the folder `/ (root)`.
 | `src/ui/`            | The writer page (Svelte 5)                                                                                                                                                  |
 | `src/editor/`        | The font editor page                                                                                                                                                        |
 | `src/fonts/samples/` | The sample fonts. `scripts/make-sample-fonts.ts` makes them.                                                                                                                |
-| `public/fonts/acsf/` | The ACSF fonts, unchanged, with their licence files                                                                                                                         |
+| `public/fonts/acsf/` | The ACSF fonts, unchanged, with their license files                                                                                                                         |
 
 ### The font format
 
@@ -96,7 +96,7 @@ A font is a JSON file (`*.font.json`, schema `stitch-writer/font`, version 1):
 
 `src/lib/font/schema.ts` and `src/lib/font/validate.ts` give the full definition.
 
-## Licences
+## Licenses
 
-The code of this project is under the MIT licence: see [LICENSE](LICENSE). The third-party data
-and fonts have their own licences: see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+The code of this project is under the MIT license: see [LICENSE](LICENSE). The third-party data
+and fonts have their own licenses: see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

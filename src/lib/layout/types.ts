@@ -30,7 +30,7 @@ export type Token =
   | { k: 'newline'; src: Span }
   | { k: 'missing'; text: string; src: Span; motif?: boolean };
 
-export type Align = 'left' | 'centre' | 'right';
+export type Align = 'left' | 'center' | 'right';
 export type DotPolicy = 'auto' | 'all' | 'none';
 
 export interface LayoutSettings {
@@ -52,7 +52,7 @@ export const DEFAULT_LAYOUT: Readonly<LayoutSettings> = Object.freeze({
   wordSpace: 1,
   letterSpacing: null,
   lineSpacing: 1,
-  align: 'centre',
+  align: 'center',
   padding: 3,
   ligatures: false,
   substitute: true,
@@ -127,8 +127,8 @@ export interface Chart {
   placements: Placement[];
   /** The ink box of the design (without padding). */
   design: LatticeRect;
-  /** The centre of the design, in lattice coordinates (a .5 value is the middle of a cell). */
-  centre: { x: number; y: number };
+  /** The center of the design, in lattice coordinates (a .5 value is the middle of a cell). */
+  center: { x: number; y: number };
   stats: { threads: Record<number, ThreadStats>; total: number };
   issues: {
     missing: { text: string; src: Span }[];

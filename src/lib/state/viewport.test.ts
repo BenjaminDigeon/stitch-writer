@@ -10,7 +10,7 @@ describe('viewport', () => {
     expect((57 - z.ty) / z.scale).toBeCloseTo(5);
   });
 
-  it('fits and centres the content', () => {
+  it('fits and centers the content', () => {
     const v = fitViewport({ w: 100, h: 20 }, { w: 1048, h: 600 }, 24, 28);
     expect(v.scale).toBe(10);
     expect(v.tx).toBe(24);

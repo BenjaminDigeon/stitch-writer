@@ -115,7 +115,7 @@
                 {:else if f instanceof Error}
                   <span class="error">Could not load: {f.message}</span>
                 {:else}
-                  <ChartThumb chart={thumb(f)} colour={app.threadColour} height={36} maxWidth={300} />
+                  <ChartThumb chart={thumb(f)} color={app.threadColor} height={36} maxWidth={300} />
                 {/if}
               </div>
             </button>

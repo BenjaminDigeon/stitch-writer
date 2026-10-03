@@ -54,7 +54,7 @@
     <div class="grid">
       {#each motifs as m (m.name)}
         <button class="motif" title="{m.label} (:{m.name}:)" onclick={() => oninsert(`:${m.name}:`)}>
-          <ChartThumb chart={m.chart} colour={app.threadColour} height={34} maxWidth={60} />
+          <ChartThumb chart={m.chart} color={app.threadColor} height={34} maxWidth={60} />
           <span>{m.label}</span>
         </button>
       {:else}

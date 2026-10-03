@@ -38,7 +38,7 @@ async function makePdf(text: string, cellMm: number, cover = true) {
       title: 'Test chart — Čeština ŏ',
       fontName: 'Test',
       threads,
-      threadColour: (t) => threads[t]!.rgb,
+      threadColor: (t) => threads[t]!.rgb,
       mode: 'both',
       fabric: DEFAULT_FABRIC,
       fabricSize: fabricSize(chart.design, DEFAULT_FABRIC),

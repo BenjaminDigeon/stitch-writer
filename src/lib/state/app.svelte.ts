@@ -39,7 +39,7 @@ export class AppState {
     return Array.from({ length: count }, (_, i) => threadById(ids[i] ?? '') ?? FALLBACK_THREADS[i % 2]!);
   });
 
-  threadColour = $derived.by(() => {
+  threadColor = $derived.by(() => {
     const list = this.threads;
     return (t: number): Rgb => (list[t] ?? list[0]!).rgb;
   });

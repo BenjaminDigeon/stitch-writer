@@ -43,7 +43,7 @@ export function makeFont(
     symbols: { ...DEFAULT_SYMBOLS },
     glyphs: defs,
     aliases: options.aliases,
-    source: { origin: 'handmade', licence: 'test' },
+    source: { origin: 'handmade', license: 'test' },
   };
   return loadFont(file);
 }

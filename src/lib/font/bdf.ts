@@ -7,7 +7,7 @@ import {
   type FontFile,
   type GlyphDef,
 } from './schema.ts';
-import { cellsToRows, normaliseGlyph, type SymbolCell } from './normalise.ts';
+import { cellsToRows, normalizeGlyph, type SymbolCell } from './normalize.ts';
 
 /**
  * Reads a BDF bitmap font (Glyph Bitmap Distribution Format 2.1) as a cross-stitch font:
@@ -72,7 +72,7 @@ export function parseBdf(text: string, info: { id: string; name?: string }): Fon
         if (packed.left) def.left = packed.left;
         def.rows = packed.rows;
       }
-      glyphs[String.fromCodePoint(enc)] = normaliseGlyph(def);
+      glyphs[String.fromCodePoint(enc)] = normalizeGlyph(def);
     }
   }
   if (!Object.keys(glyphs).length) throw new Error('The BDF font has no glyphs.');
@@ -86,8 +86,8 @@ export function parseBdf(text: string, info: { id: string; name?: string }): Fon
   const sw = spaceWidth ?? Math.max(1, Math.round(bbox.w / 2));
   for (let n = 1; n <= 4; n++) glyphs[spaceKey(n)] = { type: 'space', width: sw + n - 1 };
 
-  const licence =
-    [props.COPYRIGHT, props.NOTICE].filter(Boolean).join(' ') || 'See the licence of the BDF file.';
+  const license =
+    [props.COPYRIGHT, props.NOTICE].filter(Boolean).join(' ') || 'See the license of the BDF file.';
   return {
     schema: FONT_SCHEMA,
     version: FONT_VERSION,
@@ -104,6 +104,6 @@ export function parseBdf(text: string, info: { id: string; name?: string }): Fon
     threads: [...DEFAULT_THREADS],
     symbols: { ...DEFAULT_SYMBOLS },
     glyphs,
-    source: { origin: 'imported', licence },
+    source: { origin: 'imported', license },
   };
 }

@@ -47,7 +47,7 @@ export const EMPTY_CHART: Chart = Object.freeze({
   dots: [],
   placements: [],
   design: { x0: 0, y0: 0, x1: 0, y1: 0 },
-  centre: { x: 0, y: 0 },
+  center: { x: 0, y: 0 },
   stats: { threads: {}, total: 0 },
   issues: { missing: [], substituted: [] },
 }) as Chart;
@@ -332,7 +332,7 @@ export function layout(
     dots: dots.map((d) => ({ ...d, x: d.x + ox, y: d.y + oy })),
     placements: placementsRaw.map(({ baseline: _b, ...p }) => ({ ...p, x: p.x + ox, y: p.y + oy })),
     design,
-    centre: { x: (design.x0 + design.x1) / 2, y: (design.y0 + design.y1) / 2 },
+    center: { x: (design.x0 + design.x1) / 2, y: (design.y0 + design.y1) / 2 },
     stats: { threads, total },
     issues,
   };

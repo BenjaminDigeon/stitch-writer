@@ -7,7 +7,7 @@
 import { writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { segmentsToPolylines, type LatticeSegment } from '../src/lib/font/polyline.ts';
-import { normaliseGlyph, serializeFont } from '../src/lib/font/normalise.ts';
+import { normalizeGlyph, serializeFont } from '../src/lib/font/normalize.ts';
 import { validateFont } from '../src/lib/font/validate.ts';
 import {
   DEFAULT_SYMBOLS,
@@ -20,7 +20,7 @@ import {
 } from '../src/lib/font/schema.ts';
 
 const OUT = fileURLToPath(new URL('../src/fonts/samples/', import.meta.url));
-const LICENCE = 'CC0 1.0 — original sample font of Stitch Writer.';
+const LICENSE = 'CC0 1.0 — original sample font of Stitch Writer.';
 
 /** Glyph art: the bottom row of `rows` is on row `bottom` (baseline row = -1). */
 function art(rows: string, bottom = -1, type: GlyphDef['type'] = 'char', label?: string): GlyphDef {
@@ -155,7 +155,7 @@ function crossFont(): FontFile {
     threads: [...DEFAULT_THREADS],
     symbols: { ...DEFAULT_SYMBOLS },
     glyphs,
-    source: { origin: 'handmade', licence: LICENCE },
+    source: { origin: 'handmade', license: LICENSE },
   };
 }
 
@@ -267,12 +267,12 @@ function lineFont(): FontFile {
     threads: [...DEFAULT_THREADS],
     symbols: { ...DEFAULT_SYMBOLS },
     glyphs,
-    source: { origin: 'handmade', licence: LICENCE },
+    source: { origin: 'handmade', license: LICENSE },
   };
 }
 
 for (const font of [crossFont(), lineFont()]) {
-  font.glyphs = Object.fromEntries(Object.entries(font.glyphs).map(([k, g]) => [k, normaliseGlyph(g)]));
+  font.glyphs = Object.fromEntries(Object.entries(font.glyphs).map(([k, g]) => [k, normalizeGlyph(g)]));
   const issues = validateFont(font);
   if (issues.length)
     throw new Error(`${font.id}:\n${issues.map((i) => `${i.path}: ${i.message}`).join('\n')}`);

@@ -1,4 +1,4 @@
-import { ACSF_FONTS, ACSF_LICENCE, ACSF_URL } from './acsf.ts';
+import { ACSF_FONTS, ACSF_LICENSE, ACSF_URL } from './acsf.ts';
 import { loadFont, type Font, type Glyph } from './font.ts';
 import type { FontFile } from './schema.ts';
 import { parseFontFile } from './validate.ts';
@@ -58,7 +58,7 @@ const acsfEntries: FontEntry[] = ACSF_FONTS.map((f) => ({
     return loadTtfFont(new Uint8Array(bytes), {
       id: f.id,
       name: f.name,
-      licence: ACSF_LICENCE,
+      license: ACSF_LICENSE,
       url: ACSF_URL,
     });
   }),

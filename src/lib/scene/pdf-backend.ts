@@ -34,7 +34,7 @@ import {
 } from 'pdf-lib';
 import type { PathOp, Rgb, SceneDoc, SceneNode, Stroke, TextMeasure } from './types.ts';
 
-/** Millimetres to PDF points. */
+/** Millimeters to PDF points. */
 export const MM_TO_PT = 72 / 25.4;
 
 export interface PdfFonts {
@@ -157,8 +157,8 @@ function drawNode(ctx: Ctx, n: SceneNode): void {
       return;
     case 'circles': {
       const ops: PathOp[] = [];
-      for (let i = 0; i < n.centres.length; i += 2)
-        ops.push(...circlePath(n.centres[i]!, n.centres[i + 1]!, n.r));
+      for (let i = 0; i < n.centers.length; i += 2)
+        ops.push(...circlePath(n.centers[i]!, n.centers[i + 1]!, n.r));
       paint(ctx, pathOps(ops), n.fill, undefined);
       return;
     }
@@ -212,7 +212,7 @@ export async function pdfTextMeasure(fonts: PdfFonts): Promise<TextMeasure> {
   };
 }
 
-/** Draws the scene document as a vector PDF. Units of the scene are millimetres. */
+/** Draws the scene document as a vector PDF. Units of the scene are millimeters. */
 export async function renderPdf(scene: SceneDoc, fonts: PdfFonts, meta: PdfMeta = {}): Promise<Uint8Array> {
   const doc = await PDFDocument.create();
   doc.registerFontkit(fontkit);
@@ -239,7 +239,7 @@ export async function renderPdf(scene: SceneDoc, fonts: PdfFonts, meta: PdfMeta 
         bold: { font: bold, key: page.node.newFontDictionary(bold.name, bold.ref), chars: boldChars },
       },
     };
-    // Scene coordinates: millimetres, origin top-left, y down.
+    // Scene coordinates: millimeters, origin top-left, y down.
     ctx.ops.push(
       pushGraphicsState(),
       concatTransformationMatrix(MM_TO_PT, 0, 0, -MM_TO_PT, 0, p.h * MM_TO_PT),

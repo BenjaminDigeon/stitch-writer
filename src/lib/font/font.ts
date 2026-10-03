@@ -71,7 +71,7 @@ export interface Font {
   ligatures: readonly string[];
   connectivity: 4 | 8;
   origin: 'imported' | 'handmade';
-  licence: string;
+  license: string;
   file: FontFile;
   /** Present for OpenType fonts. Then the glyphs map fills up when the text is shaped. */
   shaper?: Shaper;
@@ -150,7 +150,7 @@ export function loadFont(file: FontFile): Font {
     ligatures,
     connectivity: file.connectors?.connectivity ?? 4,
     origin: file.source.origin,
-    licence: file.source.licence,
+    license: file.source.license,
     file,
   };
 }

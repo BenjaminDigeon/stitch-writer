@@ -17,7 +17,7 @@ export function zoomAt(v: Viewport, factor: number, px: number, py: number): Vie
   return { scale, tx: px - (px - v.tx) * k, ty: py - (py - v.ty) * k };
 }
 
-/** Fits the content in the view, centred, with a margin. `offset` moves the view origin (rulers). */
+/** Fits the content in the view, centered, with a margin. `offset` moves the view origin (rulers). */
 export function fitViewport(
   content: { w: number; h: number },
   view: { w: number; h: number },

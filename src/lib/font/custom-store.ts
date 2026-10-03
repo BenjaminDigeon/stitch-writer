@@ -2,27 +2,35 @@ import { createStore, del, entries, get, set } from 'idb-keyval';
 import { loadFont } from './font.ts';
 import type { FontEntry } from './registry.ts';
 import type { FontFile } from './schema.ts';
-import { parseFontFile } from './validate.ts';
+import { parseFontFile, upgradeFontFile } from './validate.ts';
 import { storageName } from '../preview.ts';
 
 /** A font that the user made or imported. It is kept in IndexedDB, in this browser only. */
 export type CustomFontRecord =
   | { type: 'json'; id: string; name: string; file: FontFile; updatedAt: number }
-  | { type: 'ttf'; id: string; name: string; bytes: Uint8Array; licence: string; updatedAt: number };
+  | { type: 'ttf'; id: string; name: string; bytes: Uint8Array; license: string; updatedAt: number };
 
 const store =
   typeof indexedDB === 'undefined' ? undefined : createStore(storageName('stitch-writer'), 'fonts');
 
 export const FONT_CHANNEL = storageName('stitch-writer-fonts');
 
+/** Reads the older form of a record: the field `licence` (British spelling) becomes `license`. */
+function upgradeRecord(rec: CustomFontRecord): CustomFontRecord {
+  if (rec.type === 'json') return { ...rec, file: upgradeFontFile(rec.file) };
+  const { licence, ...rest } = rec as typeof rec & { licence?: string };
+  return typeof licence === 'string' && rec.license === undefined ? { ...rest, license: licence } : rec;
+}
+
 export async function listCustomFonts(): Promise<CustomFontRecord[]> {
   if (!store) return [];
   const all = await entries<string, CustomFontRecord>(store);
-  return all.map(([, v]) => v).sort((a, b) => a.name.localeCompare(b.name));
+  return all.map(([, v]) => upgradeRecord(v)).sort((a, b) => a.name.localeCompare(b.name));
 }
 
 export async function getCustomFont(id: string): Promise<CustomFontRecord | undefined> {
-  return store ? get<CustomFontRecord>(id, store) : undefined;
+  const rec = store ? await get<CustomFontRecord>(id, store) : undefined;
+  return rec && upgradeRecord(rec);
 }
 
 export async function putCustomFont(rec: CustomFontRecord): Promise<void> {
@@ -55,7 +63,7 @@ export function customFontEntry(rec: CustomFontRecord): FontEntry {
     load: async () => {
       if (rec.type === 'json') return loadFont(parseFontFile({ ...rec.file, id: rec.id, name: rec.name }));
       const { loadTtfFont } = await import('./ttf.ts');
-      return loadTtfFont(rec.bytes, { id: rec.id, name: rec.name, licence: rec.licence });
+      return loadTtfFont(rec.bytes, { id: rec.id, name: rec.name, license: rec.license });
     },
   };
 }

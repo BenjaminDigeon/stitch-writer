@@ -9,7 +9,7 @@ export interface PosterInput {
   chart: Chart;
   title: string;
   threads: readonly Thread[];
-  threadColour: (t: number) => Rgb;
+  threadColor: (t: number) => Rgb;
   mode: RenderMode;
   fabric: FabricSettings;
   fabricSize: FabricSize;
@@ -32,7 +32,7 @@ export function buildPoster(p: PosterInput): ScenePage {
     t: 'group',
     tx: pad + left,
     ty: pad + top,
-    children: buildChartLayer(p.chart, printStyle(s, p.mode, p.threadColour)),
+    children: buildChartLayer(p.chart, printStyle(s, p.mode, p.threadColor)),
   });
   for (let v = 10; v <= p.chart.width; v += 10) {
     out.push({
@@ -79,7 +79,7 @@ export function buildPoster(p: PosterInput): ScenePage {
         y: y - 3,
         w: 4,
         h: 4,
-        fill: p.threadColour(r.thread),
+        fill: p.threadColor(r.thread),
         stroke: { color: [120, 120, 120], width: 0.15 },
       });
       const text = `DMC ${r.dmc.id} ${r.dmc.name}: ${describeRow(r, p.fabric.units)}`;

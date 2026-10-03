@@ -9,7 +9,7 @@
     [`${mod} K`, 'Insert a motif or a special character'],
     [':heart', 'Motif names: type ":" and the start of the name'],
     [`${mod} P`, 'Export the chart (PDF, SVG, PNG)'],
-    [`${mod} ⇧ L / E / R`, 'Align left, centre, right'],
+    [`${mod} ⇧ L / E / R`, 'Align left, center, right'],
     [`${mod} Z`, 'Undo the last change of the text'],
     [`${mod} + wheel, pinch`, 'Zoom the chart at the pointer'],
     ['Wheel, drag', 'Move the chart'],

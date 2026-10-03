@@ -21,7 +21,7 @@
     return () => window.removeEventListener('pagehide', flush);
   });
 
-  const colour = (t: number): Rgb => (t === 1 ? [224, 90, 122] : [56, 76, 94]);
+  const color = (t: number): Rgb => (t === 1 ? [224, 90, 122] : [56, 76, 94]);
 
   const TOOLS: { id: Tool; label: string; key: string; hint: string }[] = [
     { id: 'X', label: '✕ Stitch', key: 'b', hint: 'Full stitch, main thread (B)' },
@@ -227,7 +227,7 @@
         This is a TTF font. The writer uses it with its joins and ligatures. You cannot change a TTF font
         here.
       </p>
-      <p class="muted">{ed.ttf.licence}</p>
+      <p class="muted">{ed.ttf.license}</p>
       <div class="actions">
         <button class="btn" onclick={() => ed.convertTtf()}>Make an editable copy (without the joins)</button>
       </div>
@@ -260,7 +260,7 @@
               title={k}
             >
               <span class="thumb"
-                >{#if thumb}<ChartThumb chart={thumb} {colour} height={28} maxWidth={44} />{/if}</span
+                >{#if thumb}<ChartThumb chart={thumb} {color} height={28} maxWidth={44} />{/if}</span
               >
               <span class="key"
                 >{k.startsWith('space-') ? `␣${k.slice(6)}` : k.length > 3 ? k.slice(0, 7) : k}</span
@@ -329,7 +329,7 @@
               >
             </span>
             <label class="inline"
-              >Neighbour <input type="text" maxlength="2" bind:value={ed.neighbours} class="tiny" /></label
+              >Neighbor <input type="text" maxlength="2" bind:value={ed.neighbors} class="tiny" /></label
             >
             <span class="spacer"></span>
             <button class="btn ghost" onclick={() => ed.edit(clearGlyph)}>Clear</button>
@@ -344,7 +344,7 @@
           {/if}
           <p class="legend muted">
             <span class="sw base"></span> baseline <span class="sw xh"></span> x-height
-            <span class="sw adv"></span> advance box (the space for the letter). Grey cells: the neighbour letter,
+            <span class="sw adv"></span> advance box (the space for the letter). Gray cells: the neighbor letter,
             with the letter spacing.
           </p>
         {:else}
@@ -406,9 +406,9 @@
           /> Joined letters (connector dots)</label
         >
         <label class="field"
-          ><span>Licence and author</span><textarea
+          ><span>License and author</span><textarea
             rows="3"
-            bind:value={ed.file.source.licence}
+            bind:value={ed.file.source.license}
             oninput={() => ed.touch()}></textarea></label
         >
         {#if ed.file.source.basedOn}<p class="muted">Based on {ed.file.source.basedOn}.</p>{/if}
@@ -416,7 +416,7 @@
         <h2>Preview</h2>
         <textarea rows="2" bind:value={ed.sample} aria-label="Preview text"></textarea>
         <div class="preview">
-          {#if preview}<ChartThumb chart={preview} {colour} height={160} maxWidth={300} />{/if}
+          {#if preview}<ChartThumb chart={preview} {color} height={160} maxWidth={300} />{/if}
         </div>
         {#if preview?.issues.missing.length}
           <p class="bad">Missing: {[...new Set(preview.issues.missing.map((m) => m.text))].join(' ')}</p>

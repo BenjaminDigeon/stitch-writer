@@ -48,7 +48,7 @@ describe('page tiling', () => {
     expect(c).toBeLessThan(1);
   });
 
-  it('covers every cell, and neighbour pages share exactly the overlap', () => {
+  it('covers every cell, and neighbor pages share exactly the overlap', () => {
     fc.assert(
       fc.property(
         fc.integer({ min: 1, max: 400 }),

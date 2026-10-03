@@ -9,7 +9,7 @@ import {
   type FontFile,
   type GlyphDef,
 } from './schema.ts';
-import { cellsToRows, normaliseGlyph } from './normalise.ts';
+import { cellsToRows, normalizeGlyph } from './normalize.ts';
 
 /**
  * The grid of a cross-stitch TTF font. Each stitch is a shape of size `mark` inside a cell of size
@@ -118,7 +118,7 @@ function bestResidue(values: number[], pitch: number): { residue: number; score:
   let residue = 0;
   let best = -1;
   for (const [r, n] of counts) {
-    // Count the neighbours too: a 1-unit tolerance for rounding in the font.
+    // Count the neighbors too: a 1-unit tolerance for rounding in the font.
     const total = n + (counts.get((r + 1) % pitch) ?? 0) + (counts.get((r - 1 + pitch) % pitch) ?? 0);
     if (total > best) {
       best = total;
@@ -158,7 +158,7 @@ export function detectTtfGrid(font: FkFont): TtfGrid {
   throw new Error('Could not find the stitch grid of this TTF font.');
 }
 
-/** The cells of one TTF glyph: a cell is stitched when the centre of its stitch shape is inside the outline. */
+/** The cells of one TTF glyph: a cell is stitched when the center of its stitch shape is inside the outline. */
 export function ttfGlyphCells(glyph: FkGlyph, grid: TtfGrid): GlyphCell[] {
   const polys = pathToPolygons(glyph.path.commands);
   if (!polys.length) return [];
@@ -183,7 +183,7 @@ export function ttfGlyphCells(glyph: FkGlyph, grid: TtfGrid): GlyphCell[] {
 export interface TtfFontInfo {
   id: string;
   name: string;
-  licence: string;
+  license: string;
   url?: string;
 }
 
@@ -298,7 +298,7 @@ export function loadTtfFont(bytes: Uint8Array, info: TtfFontInfo): Font {
     threads: [...DEFAULT_THREADS],
     symbols: { ...DEFAULT_SYMBOLS },
     glyphs: {},
-    source: { origin: 'imported', url: info.url, licence: info.licence },
+    source: { origin: 'imported', url: info.url, license: info.license },
   };
   return {
     id: info.id,
@@ -313,7 +313,7 @@ export function loadTtfFont(bytes: Uint8Array, info: TtfFontInfo): Font {
     ligatures: [],
     connectivity: 4,
     origin: 'imported',
-    licence: info.licence,
+    license: info.license,
     file,
     shaper,
   };
@@ -340,7 +340,7 @@ export function ttfToFontFile(bytes: Uint8Array, info: TtfFontInfo): FontFile {
       if (packed.left) def.left = packed.left;
       def.rows = packed.rows;
     }
-    glyphs[String.fromCodePoint(cp)] = normaliseGlyph(def);
+    glyphs[String.fromCodePoint(cp)] = normalizeGlyph(def);
   }
   for (let n = 1; n <= 4; n++)
     glyphs[spaceKey(n)] = { type: 'space', width: loaded.glyphs.get(spaceKey(n))!.width };
